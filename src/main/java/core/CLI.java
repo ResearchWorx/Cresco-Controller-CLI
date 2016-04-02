@@ -16,8 +16,8 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.TreeMap;
 
-import graphdb.GraphDBEngine;
 import channels.ControllerChannel;
+import graphdb.GraphDBEngine;
 import shared.MsgEvent;
 import shared.MsgEventType;
 
@@ -31,9 +31,11 @@ public class CLI {
 	public static int controllerport = 32000;
 	public static GraphDBEngine gdb;
 	public static ControllerChannel cc;
+    public static Random rand = null;
 
 	public static void main(String[] args) throws Exception 
 	{
+        rand = new Random();
 
         String configFile = checkConfig(args);
 
@@ -44,579 +46,323 @@ public class CLI {
         gdb = new GraphDBEngine(); //create graphdb connector
 		
 		cc = new ControllerChannel();
-		//String pluginName = "cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar";
-		//downloadPlugin("region0","agent-hzkl",plugin,"http://10.33.4.63");
-		//addPlugin("region0","agent-kmqo","1");
-		//removePlugin("region0","agent-clzk","plugin/4");
-		//gdb.deleteNodesAndRelationships(1162);
-		
-		
-		//addPlugin("region0","agent-clzk","1");
-		
-	//String region = "region0";
-		ArrayList<Long> regionList = gdb.getRegions();
-		System.out.println("Region Count: " + regionList.size());
-		for(long regionId : regionList)
-		{
-			String region = gdb.getNodeParam(regionId, "regionname");
-			System.out.println("Region: " + region);
-			
-			ArrayList<Long> agentList = gdb.getAgentsInRegion(regionId);
-			System.out.println("Region " + region + " Agent Count: " + agentList.size()); 
-			for(long agentId : agentList)
-			{
-				String agent = gdb.getNodeParam(agentId, "agentname");
-				//System.out.println("\tAgent: " + agent);
-				if(region.equals("region0"))
-				{   
-					//10.33.4.56
-					//10.33.4.58
-					//10.33.4.60
-					//10.33.4.62
-					
-					/*
-				    addInPlugin(region,agent,"10.33.8.4", "1", "100");
-					addInPlugin(region,agent,"10.33.4.58", "1", "100");
-					addInPlugin(region,agent,"10.33.4.60", "1", "100");
-					addInPlugin(region,agent,"10.33.4.62", "1", "100");
-					addOutPlugin(region,agent,"10.33.8.4", "1", "100");
-					addOutPlugin(region,agent,"10.33.4.58", "1", "100");
-					addOutPlugin(region,agent,"10.33.4.60", "1", "100");
-					addOutPlugin(region,agent,"10.33.4.62", "1", "100");
-					*/
-					
-					//addOutPlugin(region,agent,"10.33.8.4");
-					//System.out.println("add region0 plugin");
-					//addPlugin(region,agent,"1");
-				}
-				
-				//String pluginName = "cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar";
-				/*
-				String pluginName = "cresco-agent-MD5processor-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar";
-				System.out.println("\tDownloading: " + pluginName);
-				downloadPlugin(region,agent,pluginName,"http://10.33.4.63");
-				*/
-				//addPlugin(region,agent,"1");
-				//removePlugin("region0","agent-kmqo","plugin/4");
-				
-				
-				ArrayList<Long> pluginList = gdb.getPluginInAgent(agentId);
-				System.out.println("Region " + region + " Agent " + agent + " Plugin Count: " + pluginList.size()); 
-				
-				for(long pluginId : pluginList)
-				{
-					try
-					{
-						String plugin = gdb.getNodeParam(pluginId, "pluginname");
-						String configparams = gdb.getNodeParam(pluginId, "configparams");
-						
-						String propertiesFormat = configparams.replaceAll(",", "\n");
-				        Properties properties = new Properties();
-				        properties.load(new StringReader(propertiesFormat));
-				        
-				        //cresco-agent-MD5processor-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar
-				        //if(properties.getProperty("jarfile").contains("cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar"))
-				        if(properties.getProperty("jarfile").contains("cresco-agent-MD5processor-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar"))
-					    {	
-				        	System.out.println("removing plugin");
-				        	System.out.println(properties);
-				        	System.out.println(plugin);
-				        	//removePlugin(region,agent,plugin);
-						}
-					}
-					catch(Exception ex)
-					{
-						System.out.println(ex);
-						String plugin = gdb.getNodeParam(pluginId, "pluginname");
-						//removePlugin(region,agent,plugin);
-					}
-					
-					//System.out.println("\t\tPlugin: " + plugin);
-					
-					/*
-					String propertiesFormat = configparams.replaceAll(",", "\n");
-			        Properties properties = new Properties();
-			        properties.load(new StringReader(propertiesFormat));
-			        
-			        if(properties.getProperty("jarfile").contains("cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar"))
-			        {
-			        	//System.out.println(properties);
-			        	//System.out.println(plugin);
-			        	//removePlugin(region,agent,plugin);
-					}
-			        */
-					
-					//removePlugin(region,agent,plugin);
-					
-					
-					//System.out.println(pluginId);
-					/*
-					Map<String,String> pluginParams = gdb.getNodeParams(pluginId);
-					Iterator it = pluginParams.entrySet().iterator();
-				    while (it.hasNext()) {
-				        Map.Entry pairs = (Map.Entry)it.next();
-				        System.out.println(pairs.getKey() + " = " + pairs.getValue());
-				        it.remove(); // avoids a ConcurrentModificationException
-				    }
-				    */
-				}
-				
-			}
-		}
-	
-		//createApp();
-		//improveApp("demo_app");
-		//cleanApp("demo_app");
-		//forceCleanDB("demo_app");
-		
-		
-		
-	}
-	public static void createApp()
-	{
-		System.out.println("Creating demo_app");
-	
-		Random rand = new Random();
 
-	    // nextInt is normally exclusive of the top value,
-	    // so add 1 to make it inclusive
-	    for(int x = 0; x < 2; x = x+1) 
-	    {
-	    	
-	    	for(int xx = 0; xx < 2; xx = xx+1) 
-		    {
-	    		
-	    		for(int xxx = 0; xxx < 4; xxx = xxx+1) 
-			    {
-	    			int randomNum = rand.nextInt((10 - 1) + 1) + 1;
-	    		    System.out.println("Creating Plugin for region" + x + " agent" + xx + " config=" + randomNum);
-	    			addPlugin("region" + x,"agent" + xx,String.valueOf(randomNum));
-	    			try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			    }
-		    
-		    }
-		    
-	         
-	    }
-		/*
-		addPlugin("region0","agent0","2");
-		addPlugin("region0","agent0","1");
-		addPlugin("region0","agent0","5");
-		
-		addPlugin("region0","agent1","1");
-		addPlugin("region0","agent1","10");
-		addPlugin("region0","agent1","5");
-		
-		addPlugin("region1","agent0","5");
-		addPlugin("region1","agent0","1");
-		addPlugin("region1","agent0","5");
-		
-		addPlugin("region1","agent1","0");
-		addPlugin("region1","agent1","1");
-		addPlugin("region1","agent1","2");
-		*/
-	}
-	public static void improveApp(String application) throws InterruptedException
-	{
-		long totalPerformance = 0;
-		long appNodeId = gdb.getAppNodeId(application);
-		if(appNodeId == -1)
-		{
-			System.out.println("No application to improve");
-			System.exit(0);
-		}
-		Map<Long,Long> pluginPerf = gdb.getPerfMetrics(appNodeId);
-		Map<Long,Long> agentPluginMap = new HashMap<Long,Long>(); 
-		Map<Long,Long> regionAgentMap = new HashMap<Long,Long>();
-	
-		ArrayList<Long> regionIdList = new ArrayList<Long>();  
-		ArrayList<Long> agentIdList = new ArrayList<Long>();  
-		
-		if(pluginPerf == null)
-		{
-			System.out.println("No plugins to improve");
-			System.exit(0);
-		}
-		System.out.println("Collected Performance Metrics from: " + pluginPerf.size() + " plugins");
-		
-		
-		for (Entry<Long, Long> entry : pluginPerf.entrySet())
-		{
-			//System.out.println("plugin: " + entry.getKey() + "/ metric: " + entry.getValue());
-			//System.out.println(gdb.getAgentFromPlugin(entry.getKey()));
-			long agentId = gdb.getAgentFromPlugin(entry.getKey());
-			if(!agentIdList.contains(agentId))
-			{
-				agentIdList.add(agentId);
-			}
-			agentPluginMap.put(entry.getKey(), agentId);
-		}
-		System.out.println("Related " + pluginPerf.size() + " plugins to " + agentIdList.size() + " Agents");
-		for (Entry<Long, Long> entry : agentPluginMap.entrySet())
-		{
-			//System.out.println("plugin: " + entry.getKey() + "/ agent: " + entry.getValue());
-			if(!regionAgentMap.containsKey(entry.getValue()))
-			{
-				long regionId = gdb.getRegionFromAgent(entry.getValue());
-				if(!regionIdList.contains(regionId))
-				{
-					regionIdList.add(regionId);
-				}
-				regionAgentMap.put(entry.getValue(), regionId);
-			}
-		}
-		System.out.println("Related " + agentIdList.size()  + " agents to " + regionIdList.size() + " Regions");
-		System.out.println(" ");
-		for(long regionId : regionIdList)
-		{
-			String region = gdb.getPropertyByNodeId("regionname",regionId);
-			System.out.println("Region: " + region);
-			for (Entry<Long, Long> entry : regionAgentMap.entrySet())
-			{
-				long agentId = entry.getKey();
-				String agent = gdb.getPropertyByNodeId("agentname",agentId);
-				if(entry.getValue() == regionId)
-				{
-					System.out.println("\t\tAgent: " + agent);
-					//int pluginCount = 0;
-					Map<Long,Long> perfSortedPlugin =  new TreeMap<Long,Long>();
-					
-					for (Entry<Long, Long> pluginentry : agentPluginMap.entrySet())
-					{
-						long pluginId = pluginentry.getKey();
-						if(pluginentry.getValue() == agentId)
-						{
-							//build plugin list
-							perfSortedPlugin.put(pluginId, pluginPerf.get(pluginId));
-							//System.out.println("\t\t\t\tPlugin: " + gdb.getPropertyByNodeId("pluginname",pluginId) + " Perf: " + pluginPerf.get(pluginId));
-						}
-					}
-					perfSortedPlugin = sortByValues(perfSortedPlugin); //sort based on performance
-					boolean isFirst = true;
-					for (Entry<Long, Long> sortedentry : perfSortedPlugin.entrySet())
-					{
-						long pluginId = sortedentry.getKey();
-						String plugin =  gdb.getPropertyByNodeId("pluginname",pluginId);
-						totalPerformance += pluginPerf.get(pluginId);
-						System.out.println("\t\t\t\tPlugin: " + plugin + " [Config=" + gdb.getPluginParamsByNodeId("perflevel", pluginId) + "] [Perf=" + pluginPerf.get(pluginId) + "]");
-						//System.out.println( gdb.getPropertyByRelationId("perflevel", pluginId, appNodeId, RelType.isConnected));
-						
-					}
-					int pluginBudget = 5;
-					if(perfSortedPlugin.size() < pluginBudget)
-					{
-						long topPlugin = (long) perfSortedPlugin.keySet().toArray()[0];
-						String perflevel = gdb.getPluginParamsByNodeId("perflevel", topPlugin);
-						String plugin = gdb.getPropertyByNodeId("pluginname",topPlugin);
-						//System.out.println("Top = " + perfSortedPlugin.keySet().toArray()[0] + " " + gdb.getPropertyByNodeId("pluginname",tmp));	
-						System.out.println("\t\t+Adding new Plugin with Config=" + perflevel + "\n");
-						addPlugin(region, agent, perflevel);
-						Thread.sleep(1000); //sleep on add
-						System.out.println(" ");
-						
-						
-					}
-					else //budget it max.. must remove
-					{
-						long bottomPlugin = (long) perfSortedPlugin.keySet().toArray()[perfSortedPlugin.keySet().size()-1];
-						String perflevel = gdb.getPluginParamsByNodeId("perflevel", bottomPlugin);
-						String plugin = gdb.getPropertyByNodeId("pluginname",bottomPlugin);
-						System.out.println("\t\t*No more plugin budget: Maximum=" + pluginBudget);
-						System.out.println("\t\t-Removing old Plugin: " + plugin + " with Config=" + perflevel);
-						removePlugin(region,agent,plugin);
-						Thread.sleep(1000); //sleep on remove
-						long topPlugin = (long) perfSortedPlugin.keySet().toArray()[0];
-						perflevel = gdb.getPluginParamsByNodeId("perflevel", topPlugin);
-						plugin = gdb.getPropertyByNodeId("pluginname",topPlugin);
-						//System.out.println("Top = " + perfSortedPlugin.keySet().toArray()[0] + " " + gdb.getPropertyByNodeId("pluginname",tmp));	
-						System.out.println("\t\t+Adding new Plugin with Config=" + perflevel + "\n");
-						addPlugin(region, agent, perflevel);
-						Thread.sleep(1000); //sleep on add
-						System.out.println(" ");
-						
-					}
-				}
-			}
-			
-		}
-		System.out.println("Total Performance=" + totalPerformance);
-	}
-	public static void cleanApp(String application)
-	{
-		long appNodeId = gdb.getAppNodeId(application);
-		if(appNodeId == -1)
-		{
-			System.out.println("No application to clean");
-			System.exit(0);
-		}
-		Map<Long,Long> pluginPerf = gdb.getPerfMetrics(appNodeId);
-		Map<Long,Long> agentPluginMap = new HashMap<Long,Long>(); 
-		Map<Long,Long> regionAgentMap = new HashMap<Long,Long>();
-	
-		ArrayList<Long> regionIdList = new ArrayList<Long>();  
-		ArrayList<Long> agentIdList = new ArrayList<Long>();  
-		
-		if(pluginPerf == null)
-		{
-			System.out.println("No plugins to improve");
-			System.exit(0);
-		}
-		System.out.println("Collected Performance Metrics from: " + pluginPerf.size() + " plugins");
-		
-		
-		for (Entry<Long, Long> entry : pluginPerf.entrySet())
-		{
-			//System.out.println("plugin: " + entry.getKey() + "/ metric: " + entry.getValue());
-			//System.out.println(gdb.getAgentFromPlugin(entry.getKey()));
-			long agentId = gdb.getAgentFromPlugin(entry.getKey());
-			if(!agentIdList.contains(agentId))
-			{
-				agentIdList.add(agentId);
-			}
-			agentPluginMap.put(entry.getKey(), agentId);
-		}
-		System.out.println("Related " + pluginPerf.size() + " plugins to " + agentIdList.size() + " Agents");
-		for (Entry<Long, Long> entry : agentPluginMap.entrySet())
-		{
-			//System.out.println("plugin: " + entry.getKey() + "/ agent: " + entry.getValue());
-			if(!regionAgentMap.containsKey(entry.getValue()))
-			{
-				long regionId = gdb.getRegionFromAgent(entry.getValue());
-				if(!regionIdList.contains(regionId))
-				{
-					regionIdList.add(regionId);
-				}
-				regionAgentMap.put(entry.getValue(), regionId);
-			}
-		}
-		System.out.println("Related " + agentIdList.size()  + " agents to " + regionIdList.size() + " Regions");
-		System.out.println(" ");
-		for(long regionId : regionIdList)
-		{
-			String region = gdb.getPropertyByNodeId("regionname",regionId);
-			System.out.println("Region: " + region);
-			for (Entry<Long, Long> entry : regionAgentMap.entrySet())
-			{
-				long agentId = entry.getKey();
-				String agent = gdb.getPropertyByNodeId("agentname",agentId);
-				if(entry.getValue() == regionId)
-				{
-					System.out.println("\t\tAgent: " + agent);
-					//int pluginCount = 0;
-					Map<Long,Long> perfSortedPlugin =  new TreeMap<Long,Long>();
-					
-					for (Entry<Long, Long> pluginentry : agentPluginMap.entrySet())
-					{
-						long pluginId = pluginentry.getKey();
-						if(pluginentry.getValue() == agentId)
-						{
-							String plugin = gdb.getPropertyByNodeId("pluginname",pluginId);
-							System.out.println("Removing Plugin: " + plugin);
-							removePlugin(region, agent, plugin);
-							try {
-								Thread.sleep(1000);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					
-					}
-					
-				}
-		}
-			
-		}
-	}
-	public static void forceCleanDB(String application)
-	{
-		long appNodeId = gdb.getAppNodeId(application);
-		if(appNodeId == -1)
-		{
-			System.out.println("No application to cleanDb");
-			System.exit(0);
-		}
-		Map<Long,Long> pluginPerf = gdb.getPerfMetrics(appNodeId);
-		Map<Long,Long> agentPluginMap = new HashMap<Long,Long>(); 
-		Map<Long,Long> regionAgentMap = new HashMap<Long,Long>();
-	
-		ArrayList<Long> regionIdList = new ArrayList<Long>();  
-		ArrayList<Long> agentIdList = new ArrayList<Long>();  
-		
-		if(pluginPerf == null)
-		{
-			System.out.println("No plugins to improve");
-			System.exit(0);
-		}
-		System.out.println("Collected Performance Metrics from: " + pluginPerf.size() + " plugins");
-		
-		
-		for (Entry<Long, Long> entry : pluginPerf.entrySet())
-		{
-			//System.out.println("plugin: " + entry.getKey() + "/ metric: " + entry.getValue());
-			//System.out.println(gdb.getAgentFromPlugin(entry.getKey()));
-			long agentId = gdb.getAgentFromPlugin(entry.getKey());
-			if(!agentIdList.contains(agentId))
-			{
-				agentIdList.add(agentId);
-			}
-			agentPluginMap.put(entry.getKey(), agentId);
-		}
-		System.out.println("Related " + pluginPerf.size() + " plugins to " + agentIdList.size() + " Agents");
-		for (Entry<Long, Long> entry : agentPluginMap.entrySet())
-		{
-			//System.out.println("plugin: " + entry.getKey() + "/ agent: " + entry.getValue());
-			if(!regionAgentMap.containsKey(entry.getValue()))
-			{
-				long regionId = gdb.getRegionFromAgent(entry.getValue());
-				if(!regionIdList.contains(regionId))
-				{
-					regionIdList.add(regionId);
-				}
-				regionAgentMap.put(entry.getValue(), regionId);
-			}
-		}
-		System.out.println("Related " + agentIdList.size()  + " agents to " + regionIdList.size() + " Regions");
-		System.out.println(" ");
-		for(long regionId : regionIdList)
-		{
-			String region = gdb.getPropertyByNodeId("regionname",regionId);
-			System.out.println("Region: " + region);
-			for (Entry<Long, Long> entry : regionAgentMap.entrySet())
-			{
-				long agentId = entry.getKey();
-				String agent = gdb.getPropertyByNodeId("agentname",agentId);
-				if(entry.getValue() == regionId)
-				{
-					System.out.println("\t\tAgent: " + agent);
-					//int pluginCount = 0;
-					Map<Long,Long> perfSortedPlugin =  new TreeMap<Long,Long>();
-					
-					for (Entry<Long, Long> pluginentry : agentPluginMap.entrySet())
-					{
-						long pluginId = pluginentry.getKey();
-						if(pluginentry.getValue() == agentId)
-						{
-							String plugin = gdb.getPropertyByNodeId("pluginname",pluginId);
-							System.out.println("Removing Plugin: " + plugin);
-							//removePlugin(region, agent, plugin);
-							gdb.removeNode(region, agent, plugin);
-							try {
-								Thread.sleep(1000);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					
-					}
-					
-				}
-		}
-			
-		}
-	}
-	
 
-	public static void addInPlugin(String region, String agent, String server, String delay, String rate)
-	{
-		MsgEvent me = new MsgEvent(MsgEventType.CONFIG,region,null,null,"add plugin");
-		me.setParam("src_region", region);
-		me.setParam("src_agent", "external");
-		me.setParam("dst_region", region);
-		me.setParam("dst_agent", agent);
-		me.setParam("controllercmd", "regioncmd");
-		me.setParam("configtype", "pluginadd");
-		String configParams = "pluginname=MD5Plugin,jarfile=/opt/Cresco/plugins/cresco-agent-MD5processor-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,ampq_control_host=" + server + ",ampq_control_username=cresco,ampq_control_password=u$cresco01,watchdogtimer=5000,perfapp=MD5in,dataqueue=md5data,dataqueuedelay=" + delay +",md5producerrate=" + rate + ",enablemd5consumer=0,enablemd5producer=1";
-		me.setParam("configparams",configParams);
-		//me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=/opt/Cresco/plugins/cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=" + region  + ",watchdogtimer=5000");
-		cc.sendMsgEvent(me);
-	}
-	public static void addOutPlugin(String region, String agent, String server, String delay, String rate)
-	{
-		MsgEvent me = new MsgEvent(MsgEventType.CONFIG,region,null,null,"add plugin");
-		me.setParam("src_region", region);
-		me.setParam("src_agent", "external");
-		me.setParam("dst_region", region);
-		me.setParam("dst_agent", agent);
-		me.setParam("controllercmd", "regioncmd");
-		me.setParam("configtype", "pluginadd");
-		String configParams = "pluginname=MD5Plugin,jarfile=/opt/Cresco/plugins/cresco-agent-MD5processor-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,ampq_control_host=" + server + ",ampq_control_username=cresco,ampq_control_password=u$cresco01,watchdogtimer=5000,dataqueuedelay=" + delay + ",perfapp=MD5out,dataqueue=md5data,dataqueuedelay=1000,md5producerrate=" + rate + ",enablemd5consumer=1,enablemd5producer=0";
-		me.setParam("configparams",configParams);
-		//me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=/opt/Cresco/plugins/cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=" + region  + ",watchdogtimer=5000");
-		cc.sendMsgEvent(me);
-	}
-	
-	
-	public static void addPlugin(String region, String agent, String perflevel)
-	{
-		MsgEvent me = new MsgEvent(MsgEventType.CONFIG,region,null,null,"add plugin");
-		me.setParam("src_region", region);
-		me.setParam("src_agent", "external");
-		me.setParam("dst_region", region);
-		me.setParam("dst_agent", agent);
-		me.setParam("controllercmd", "regioncmd");
-		me.setParam("configtype", "pluginadd");
-		me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=/opt/Cresco/plugins/cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=" + region  + ",watchdogtimer=5000");
-		cc.sendMsgEvent(me);
-	}
-	
-	public static void downloadPlugin(String region, String agent, String plugin, String pluginurl)
-	{
-		MsgEvent me = new MsgEvent(MsgEventType.CONFIG,region,null,null,"download plugin");
-		me.setParam("src_region", region);
-		me.setParam("src_agent", "external");
-		me.setParam("dst_region", region);
-		me.setParam("dst_agent", agent);
-		me.setParam("controllercmd", "regioncmd");
-		me.setParam("configtype", "plugindownload");
-		me.setParam("plugin", plugin);
-		me.setParam("pluginurl", pluginurl);
-		//me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=..//Cresco-Agent-Dummy-Plugin/target/cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=test2,watchdogtimer=5000");
-		cc.sendMsgEvent(me);
-	}
-	
-	public static void removePlugin(String region, String agent, String plugin)
-	{
-		MsgEvent me = new MsgEvent(MsgEventType.CONFIG,region,null,null,"remove plugin");
-		me.setParam("src_region", region);
-		me.setParam("src_agent", "external");
-		me.setParam("dst_region", region);
-		me.setParam("dst_agent", agent);
-		me.setParam("controllercmd", "regioncmd");
-		me.setParam("configtype", "pluginremove");
-		me.setParam("plugin", plugin);
-		cc.sendMsgEvent(me);
-		
-	}
-	
-	public static <K extends Comparable,V extends Comparable> Map<K,V> sortByValues(Map<K,V> map){
-        List<Map.Entry<K,V>> entries = new LinkedList<Map.Entry<K,V>>(map.entrySet());
-      
-        Collections.sort(entries, new Comparator<Map.Entry<K,V>>() {
- 
-            public int compare(Entry<K, V> o1, Entry<K, V> o2) {
-                //return o1.getValue().compareTo(o2.getValue());
-                return o2.getValue().compareTo(o1.getValue());
-                
-            }
-        });
-      
-        //LinkedHashMap will keep the keys in the order they are inserted
-        //which is currently sorted on natural ordering
-        Map<K,V> sortedMap = new LinkedHashMap<K,V>();
-      
-        for(Map.Entry<K,V> entry: entries){
-            sortedMap.put(entry.getKey(), entry.getValue());
+
+        ClientFunctions cf = new ClientFunctions();
+
+        String resource_id = "someresourceid";
+        //String inode_id = "someinodeid";
+        //String configparams =  "resource_id=" + resource_id +",inode_id="+ inode_id +",perflevel=1,pluginname=cresco-agent-dummy-plugin,pluginversion=0.5.0-SNAPSHOT.2325b.2015-10-02T15:58:40Z,watchdogtimer=5000";
+        //String pluginPath = cf.addPlugin(resource_id, inode_id,configparams);
+        //String pluginPath = cf.removePlugin(resource_id, inode_id);
+
+        String inode_id = "someinodeid" + 34;
+        String configparams =  "pluginname=cresco-agent-sysinfo-plugin,pluginversion=0.5.0-SNAPSHOT.${buildNumber}.2015-11-01T16:01:51Z,watchdogtimer=5000";
+        //cf.addPlugin(resource_id, inode_id,configparams);
+
+
+        for(int i = 0; i < 2; i++)
+        {
+            //String inode_id = "someinodeid" + String.valueOf(i);
+            //String configparams =  "resource_id=" + resource_id +",inode_id="+ inode_id +",perflevel=2,pluginname=cresco-agent-dummy-plugin,pluginversion=0.5.0-SNAPSHOT.2325b.2015-10-02T15:58:40Z,watchdogtimer=5000";
+            //cf.addPlugin(resource_id, inode_id,configparams);
+            //cf.removePlugin(resource_id, inode_id);
         }
-      
-        return sortedMap;
+        //cf.getEnvStatus("location", "home");
+
+        List<String> resourceList = cf.getControllerResourceInventory();
+
+
+        List<String> pluginList = cf.getControllerPluginInventory();
+        if(pluginList != null)
+        {
+            for(String pluginInfo : pluginList)
+            {
+                //System.out.println(pluginInfo);
+                cf.getPluginInfo(pluginInfo);
+                //String[] str = pluginInfo.split("=");
+                //String configParams = "pluginname=" + str[0] + ",pluginversion=" + str[1];
+
+                //String pluginPath = cf.getPluginStatus("0");
+                //String pluginPath = cf.removePlugin("some node id");
+
+                //String pluginPath = cf.addPlugin("0", "some application name",configParams);
+                //System.out.println("status_code=" + pluginPath);
+            }
+        }
+
+        //cf.updatePlugins(true);
+		/*
+		List<String> resource = gdb.getresourceNodeList(null,null);
+		if(resource != null)
+		{
+			System.out.println("Resource List");
+
+			for(String str : resource)
+			{
+
+				List<String> inodes = gdb.getresourceNodeList(str,null);
+				if(inodes == null)
+				{
+					System.out.println("NO NODES!");
+				}
+				else
+				{
+					for(String str2 : inodes)
+					{
+						System.out.println("resource_id" + str + " inode=" + str2 + " status=" + cf.getPluginStatus(str,str2));
+					}
+				}
+			}
+		}
+		*/
+		/*
+		//updating controller plugins
+		cf.updatePlugins();
+		//listing controller plugin inventory
+		List<String> pluginList = cf.getControllerPluginInventory();
+		if(pluginList != null)
+		{
+			for(String pluginInfo : pluginList)
+			{
+				System.out.println(pluginInfo);
+				//String[] str = pluginInfo.split("=");
+				//String configParams = "pluginname=" + str[0] + ",pluginversion=" + str[1];
+
+				//String pluginPath = cf.getPluginStatus("0");
+				//String pluginPath = cf.removePlugin("some node id");
+
+				//String pluginPath = cf.addPlugin("0", "some application name",configParams);
+				//System.out.println("status_code=" + pluginPath);
+			}
+		}
+		*/
+
+        //pluginPath = cf.getPluginStatus("r0","i0");
+
+        //cf.updatePlugins();
+
+
+        //isNode
+		/*
+		for(String region : gdb.getNodeList(null, null, null))
+		{
+			gdb.removeNode(region, null,null);
+		}
+		*/
+		/*
+		for(String region : gdb.getNodeList(null, null, null))
+		{
+			for(String agent : gdb.getNodeList(region, null, null))
+			{
+				for(String plugin : gdb.getNodeList(region, agent, null))
+				{
+					System.out.println("region=" + region + " agent=" + agent + " plugin=" + plugin);
+					gdb.removeNode(region, agent, plugin);
+				}
+			}
+		}
+		*/
+		/*
+		for(int i = 0; i< 30; i++)
+		{
+			new Thread(new CreateNodes()).start();
+			new Thread(new DeleteNodes()).start();
+		}
+		*/
+		/*
+		System.out.println("Starting Node Creation Service");
+		CreateNodes cn = new CreateNodes();
+		Thread cnThread = new Thread(cn);
+		cnThread.start();
+
+
+
+		System.out.println("Starting Node Delete Service");
+		DeleteNodes dn = new DeleteNodes();
+		Thread dnThread = new Thread(dn);
+		dnThread.start();
+		*/
+
+
+
+        //System.out.println(gdb.getNodeId("region0", null,null));
+        //System.out.println(gdb.getNodeId("region0","agent0",null));
+        //System.out.println(gdb.getNodeId("region0","agent0","plugin/10"));
+
+        //addNode
+        //gdb.addNode("region1000", null, null);
+
+        //System.out.println(gdb.getNodeId("region1000", null,null));
+
+        //System.out.println(gdb.addNode("region1000", "agent0", null));
+
+        //String booha = gdb.addNode("region1001", "agent0", "plugin0");
+        //String booha = gdb.addNode("region1005", "agent0", "plugin/0");
+        //System.out.println("Boojaa: " + booha);
+        //System.out.println(gdb.getNodeId("region1005","agent0","plugin/0"));
+        //System.out.println(gdb.getNodeId("region1005","agent0",null));
+        //System.out.println(gdb.getNodeId("region1005",null,null));
+
+		/*
+	    gdb.createVertexClass("rNode", rProps);
+	    gdb.createVertexClass("aNode", aProps);
+	    gdb.createVertexClass("pNode", pProps);
+
+
+		for(int i = 0; i<500; i++)
+		{
+			gdb.addrnode("region" + i);
+
+			for(int ii = 0; ii<500; ii++)
+			{
+				gdb.addanode("region" + i,"agent" + ii);
+
+				for(int iii = 0; iii<500; iii++)
+				{
+					gdb.addpnode("region" + i,"agent" + ii,"plugin/" + iii);
+
+				}
+			}
+		}
+		*/
+
+		/*
+	    OrientGraph graph = gdb.factory.getTx();
+		Index<Vertex> index = graph.getIndex("pNode.nodePath", Vertex.class);
+		//System.out.println(index.getIndexName());
+
+		System.out.println("Entity.uuid: "+index);
+        System.out.println(graph.getIndices());
+        System.out.println(graph.getIndexedKeys(Vertex.class));
+        graph.shutdown();
+		*/
+
+		/*
+		OrientGraph graph = gdb.factory.getTx();
+
+		OrientGraphQuery oQuery = (OrientGraphQuery) graph.query();
+		Iterable<Vertex> resultIterator =  oQuery.labels("pNode").has( "region", "region33" ).has( "agent", "agent33" ).vertices();
+		Iterator<Vertex> iter = resultIterator.iterator();
+		while (iter.hasNext())
+		{
+			Vertex v = iter.next();
+
+			System.out.println(v.getId().toString());
+			//System.out.println(v.getId().toString());
+		}
+		graph.shutdown();
+		*/
+
+
+        //WORKING!!!
+		/*
+		OrientGraph graph = gdb.factory.getTx();
+
+		OrientGraphQuery oQuery = (OrientGraphQuery) graph.query();
+		Iterable<Vertex> resultIterator =  oQuery.labels("pNode").has( "region", "region0" ).has( "agent", "agent0" ).vertices();
+		Iterator<Vertex> iter = resultIterator.iterator();
+		while (iter.hasNext())
+		{
+			Vertex v = iter.next();
+
+			System.out.println(v.getId().toString());
+			System.out.println(v.getId().toString());
+		}
+		graph.shutdown();
+		*/
+		/*
+		OrientGraph graph = gdb.factory.getTx();
+
+		for (Vertex v : (Iterable<Vertex>) graph.command(
+	            new OCommandSQL("SELECT rid FROM INDEX:pNode.nodePath WHERE key = [\"region1000\",\"agent1\"]")).execute())
+		{
+			OrientVertex vertex = (OrientVertex) v;
+			System.out.println(vertex.getIdentity().toString());
+			System.out.println(v.getProperty("rid").toString());
+
+		}
+		graph.shutdown();
+		*/
+
+		/*
+		//super fast
+		OrientGraph graph = gdb.factory.getTx();
+
+		for (Vertex v : (Iterable<Vertex>) graph.command(
+	            new OCommandSQL("SELECT rid FROM INDEX:pNode.nodePath WHERE key = [\"region0\",\"agent1\"]")).execute())
+		{
+			OrientVertex vertex = (OrientVertex) v;
+			System.out.println(vertex.getIdentity().toString());
+			System.out.println(v.getProperty("rid").toString());
+
+		}
+		graph.shutdown();
+		*/
+
+		/*
+		ClientFunctions cf = new ClientFunctions();
+		List<String> pluginList = cf.getControllerPluginInventory();
+		if(pluginList != null)
+		{
+			for(String pluginInfo : pluginList)
+			{
+				System.out.println(pluginInfo);
+				String[] str = pluginInfo.split("=");
+				String configParams = "pluginname=" + str[0] + ",pluginversion=" + str[1];
+
+				//String pluginPath = cf.getPluginStatus("0");
+				String pluginPath = cf.removePlugin("some node id");
+
+				//String pluginPath = cf.addPlugin("0", "some application name",configParams);
+				System.out.println("status_code=" + pluginPath);
+			}
+		}
+		*/
+        //cf.updatePlugins();
+
+		/*
+		ProvisioningEngine pe = new ProvisioningEngine();
+		String plugin = "cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar";
+		String pluginurl = "http://127.0.0.1:32003/";
+		//pe.downloadPlugin("region0", "agent0", plugin, pluginurl, false);
+
+
+		String agent_path = gdb.getLowAgent();
+		System.out.println("Agent Path: " + agent_path);
+		*/
+
+		/*
+		System.out.println(pe.getPluginName("/Users/cody/git/test/plugins0/cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar"));
+		System.out.println(pe.getPluginVersion("/Users/cody/git/test/plugins0/cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar"));
+
+		System.out.println(pe.getPluginName("/Users/cody/git/test/plugins0/cresco-agent-controller-plugin-0.5.0-SNAPSHOT.jar"));
+		System.out.println(pe.getPluginVersion("/Users/cody/git/test/plugins0/cresco-agent-controller-plugin-0.5.0-SNAPSHOT.jar"));
+		*/
+
+        //me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=" + region  + ",watchdogtimer=5000");
+
+        //pe.addPlugin("region0","agent0","1");
+        //pe.addPlugin("region0","agent0","2");
+        //pe.addPlugin("region0","agent0","3");
+        //pe.addPlugin("region0","agent0","4");
+
+        //pe.addPlugin("region0","agent1","1");
+        //pe.addPlugin("region0","agent1","1");
+
+        //pe.removePlugin("region0", "agent0","plugin/10");
+        //pe.removePlugin("region0", "agent0","plugin/11");
+        //pe.removePlugin("region0", "agent0","plugin/12");
+        //pe.removePlugin("region0", "agent0","plugin/13");
+
+
+        //pe.removePlugin("region0", "agent1","plugin/2");
+        //pe.removePlugin("region0", "agent1","plugin/3");
+
+
     }
+
 
     public static String checkConfig(String[] args)
     {
@@ -648,6 +394,22 @@ public class CLI {
         return args[1];
     }
 
+    public static int randInt(int min, int max) {
+
+        // NOTE: This will (intentionally) not run as written so that folks
+        // copy-pasting have to think about how to initialize their
+        // Random instance.  Initialization of the Random instance is outside
+        // the main scope of the question, but some decent options are to have
+        // a field that is initialized once and then re-used as needed or to
+        // use ThreadLocalRandom (if using at least Java 1.7).
+
+
+        // nextInt is normally exclusive of the top value,
+        // so add 1 to make it inclusive
+        int randomNum = rand.nextInt((max - min) + 1) + min;
+
+        return randomNum;
+    }
 
 
 }

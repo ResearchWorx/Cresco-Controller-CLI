@@ -5,12 +5,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-import shared.MsgEvent;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import core.CLI;
+import shared.MsgEvent;
 
 public class ControllerChannel {
 
@@ -18,28 +24,91 @@ public class ControllerChannel {
 	    
 	
 	private String controllerUrl;
-    private String performanceUrl;
-	
+	private String performanceUrl;
+
 	public ControllerChannel()
 	{
+		if(CLI.config.getStringParam("globalcontroller","globalcontroller_host") != null)
+		{
+			if(CLI.config.getStringParam("globalcontroller","globalcontroller_port") != null)
+			{
+				controllerUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":" + CLI.config.getStringParam("globalcontroller","globalcontroller_port") + "/API";
+			}
+			else
+			{
+				controllerUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":32000/API";
+			}
+			performanceUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":32002/API";
 
-        if(CLI.config.getStringParam("globalcontroller","globalcontroller_host") != null)
-        {
-            if(CLI.config.getStringParam("globalcontroller","globalcontroller_port") != null)
-            {
-                controllerUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":" + CLI.config.getStringParam("globalcontroller","globalcontroller_port") + "/API";
-            }
-            else
-            {
-                controllerUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":32000/API";
-            }
-            performanceUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":32002/API";
-
-        }
+		}
 		//controllerUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":" + CLI.config.getStringParam("globalcontroller","globalcontroller_port") + "/API";
-		
+		System.out.println("Global Controller URL: " + controllerUrl);
 	}
 	
+	public MsgEvent sendMsgEventReturn(MsgEvent le)
+    {
+		MsgEvent me = null;
+		
+		try
+		{
+			Map<String,String> tmpMap = le.getParams();
+			Map<String,String> leMap = null;
+			String type = null;
+			synchronized (tmpMap)
+			{
+				leMap = new ConcurrentHashMap<String,String>(tmpMap);
+				type = le.getMsgType().toString();
+			}
+			String url = controllerUrl + urlFromMsg(type,leMap);
+			URL obj = new URL(url);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+ 
+			con.setConnectTimeout(5000);
+			
+			// optional default is GET
+			con.setRequestMethod("GET");
+ 
+			//add request header
+			con.setRequestProperty("User-Agent", USER_AGENT);
+ 
+			int responseCode = con.getResponseCode();
+			
+			if(responseCode == 200)
+			{
+				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));				        
+				String inputLine;
+				StringBuffer response = new StringBuffer();
+		 
+				while ((inputLine = in.readLine()) != null) 
+				{
+						response.append(inputLine);
+				}
+				in.close();
+			
+				
+				try
+				{
+					//System.out.println(response);
+					me = meFromJson(response.toString());
+				}
+				catch(Exception ex)
+				{
+					System.out.println("Controller : ControllerChannel : Error meFromJson");
+				}					
+				return me;
+			}
+			else
+			{
+			return me;
+			}
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Controller : ControllerChannel : sendControllerLog : " + ex.toString());
+			return me;
+		}
+	}
+ 
 	public boolean sendMsgEvent(MsgEvent le)
     {
 		try
@@ -80,7 +149,7 @@ public class ControllerChannel {
 			
 				try
 				{
-					//System.out.println(response);
+					System.out.println(response);
 					//ce = meFromJson(response.toString());
 				}
 				catch(Exception ex)
@@ -101,7 +170,6 @@ public class ControllerChannel {
 		}
 	}
  
-	
     public String urlFromMsg(String type, Map<String,String> leMap)
     {
     	
@@ -128,7 +196,13 @@ public class ControllerChannel {
     	}
     }
    
-    
+    private MsgEvent meFromJson(String jsonMe)
+	{
+		Gson gson = new GsonBuilder().create();
+        MsgEvent me = gson.fromJson(jsonMe, MsgEvent.class);
+        //System.out.println(p);
+        return me;
+	} 
     
     
 	// HTTP GET request
