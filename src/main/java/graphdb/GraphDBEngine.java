@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
@@ -24,6 +25,8 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
 import core.CLI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GraphDBEngine {
 	
@@ -33,8 +36,10 @@ public class GraphDBEngine {
 	//public Cache<String, Edge> appPathCache;
 	
 	public int retryCount = 50;
-	
-	public GraphDBEngine()
+
+    private static final Logger logger = LoggerFactory.getLogger(GraphDBEngine.class);
+
+    public GraphDBEngine()
 	{
 		/*
 		nodePathCache = CacheBuilder.newBuilder()
@@ -63,8 +68,10 @@ public class GraphDBEngine {
 
         System.out.println("GraphDB Connection Url: " + connection_string);
 
+        //OLogManager.installCustomFormatter();
         factory = new OrientGraphFactory(connection_string,username,password).setupPool(10, 100);
-        
+        //factory.setUseLog(true);
+
         //initCrescoDB();
 	}
 	
