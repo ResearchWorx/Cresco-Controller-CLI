@@ -29,18 +29,17 @@ public class CLI {
             AgentTools at = new AgentTools(); //Agent (internal controller) functions
             GlobalTools gt = new GlobalTools(); //Global (external controller) functions
 
-            if(args[3].toLowerCase().equals("-at")) {
-                at.runCmd(Arrays.copyOfRange(args,4,args.length));
+            if(args[2].toLowerCase().equals("-at")) {
+                at.runCmd(Arrays.copyOfRange(args,3,args.length));
             }
-            else if(args[3].toLowerCase().equals("-gt")) {
-                gt.runCmd(Arrays.copyOfRange(args,4,args.length));
+            else if(args[2].toLowerCase().equals("-gt")) {
+                gt.runCmd(Arrays.copyOfRange(args,3,args.length));
             }
-            else {
-                logger.info("Enter -at for AgentTools or -gt for GlobalTools");
-            }
+
 
         }
         catch(Exception ex) {
+            ex.printStackTrace();
             logger.error(ex.getMessage());
             System.exit(0);
         }
@@ -58,8 +57,7 @@ public class CLI {
                 " -at <AgentTool Function> or " +
                 " -gt <GlobalTool Function>";
 
-System.out.println(args.length);
-        if (!(args.length < 2))
+        if (!(args.length > 3))
         {
             logger.error(errorMgs);
             logger.error("Invalid number of arguements.");

@@ -34,6 +34,22 @@ public class AgentTools {
 
     public void runCmd(String[] args) {
         try {
+            logger.info("Running AgentTools Command: " + args[0]);
+            //    public boolean addPlugin(String region, String agent, String configparams) {
+            if(args[0].toLowerCase().equals("addplugin")) {
+                String region = args[1];
+                String agent = args[2];
+                String configparams = args[3];
+                logger.info("Adding Plugin: Region=" + region + " Agent=" + agent + " ConfigParams=" + configparams);
+                if(addPlugin(region,agent,configparams)) {
+                    logger.info("Success");
+                }
+                else {
+                    logger.error("Failed!");
+                }
+
+                //addPlugin()
+            }
 
         } catch (Exception ex) {
             logger.error(ex.getMessage());
