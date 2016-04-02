@@ -1,4 +1,4 @@
-package plugincore;
+package shared;
 
 import java.util.HashMap;
 import java.util.Iterator;

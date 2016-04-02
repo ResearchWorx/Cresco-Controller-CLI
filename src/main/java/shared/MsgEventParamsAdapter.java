@@ -1,4 +1,4 @@
-package plugincore;
+package shared;
 
 import java.util.*;
 import javax.xml.bind.annotation.adapters.XmlAdapter;

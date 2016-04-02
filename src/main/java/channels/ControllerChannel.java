@@ -5,15 +5,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-import plugincore.MsgEvent;
-import plugincore.PluginEngine;
+import shared.MsgEvent;
+import core.CLI;
 
 public class ControllerChannel {
 
@@ -24,7 +21,7 @@ public class ControllerChannel {
 	
 	public ControllerChannel()
 	{
-		controllerUrl = "http://" + PluginEngine.controllerip + ":" + PluginEngine.controllerport + "/API";
+		controllerUrl = "http://" + CLI.config.getParam("globalcontroller_host") + ":" + CLI.controllerport + "/API";
 		
 	}
 	

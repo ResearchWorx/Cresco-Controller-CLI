@@ -1,12 +1,12 @@
-package plugincore;
+package core;
 
 
+import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,23 +17,31 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import graphdb.GraphDBEngine;
-import graphdb.GraphDBEngine.RelType;
 import channels.ControllerChannel;
+import shared.MsgEvent;
+import shared.MsgEventType;
 
 
-public class PluginEngine {
+public class CLI {
 
 
-	public static String controllerip = "10.33.4.63";
-	public static String graphDBip = "10.33.4.63";
+	public static Config config;
+	//public static String controllerip = "10.33.4.63";
+	//public static String graphDBip = "10.33.4.63";
 	public static int controllerport = 32000;
 	public static GraphDBEngine gdb;
 	public static ControllerChannel cc;
-	
+
 	public static void main(String[] args) throws Exception 
 	{
-	
-		gdb = new GraphDBEngine(graphDBip); //create graphdb connector
+
+        String configFile = checkConfig(args);
+
+        //Make sure config file
+        config = new Config(configFile);
+
+
+        gdb = new GraphDBEngine(config.getParam("gdb_host")); //create graphdb connector
 		
 		cc = new ControllerChannel();
 		//String pluginName = "cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar";
@@ -66,7 +74,7 @@ public class PluginEngine {
 					//10.33.4.60
 					//10.33.4.62
 					
-					
+					/*
 				    addInPlugin(region,agent,"10.33.8.4", "1", "100");
 					addInPlugin(region,agent,"10.33.4.58", "1", "100");
 					addInPlugin(region,agent,"10.33.4.60", "1", "100");
@@ -75,7 +83,7 @@ public class PluginEngine {
 					addOutPlugin(region,agent,"10.33.4.58", "1", "100");
 					addOutPlugin(region,agent,"10.33.4.60", "1", "100");
 					addOutPlugin(region,agent,"10.33.4.62", "1", "100");
-					
+					*/
 					
 					//addOutPlugin(region,agent,"10.33.8.4");
 					//System.out.println("add region0 plugin");
@@ -609,6 +617,37 @@ public class PluginEngine {
       
         return sortedMap;
     }
-	
-		
+
+    public static String checkConfig(String[] args)
+    {
+        String errorMgs = "Cresco-Controller\n" +
+                "Usage: java -jar Cresco-Controller.jar" +
+                " -f <configuration_file>\n";
+
+        if (args.length != 2)
+        {
+            System.err.println(errorMgs);
+            System.err.println("ERROR: Invalid number of arguements.");
+            System.exit(1);
+        }
+        else if(!args[0].equals("-f"))
+        {
+            System.err.println(errorMgs);
+            System.err.println("ERROR: Must specify configuration file.");
+            System.exit(1);
+        }
+        else
+        {
+            File f = new File(args[1]);
+            if(!f.exists())
+            {
+                System.err.println("The specified configuration file: " + args[1] + " is invalid");
+                System.exit(1);
+            }
+        }
+        return args[1];
+    }
+
+
+
 }
