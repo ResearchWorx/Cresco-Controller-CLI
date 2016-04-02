@@ -16,9 +16,9 @@ public class Config {
 	}
 	
 	
-	public String getParam(String param)
+	public String getStringParam(String group, String param)
 	{
-		SubnodeConfiguration sObj = iniConfObj.getSection("general");
+		SubnodeConfiguration sObj = iniConfObj.getSection(group);
 		return sObj.getString(param);	    
 	}
 	

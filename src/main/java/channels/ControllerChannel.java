@@ -18,10 +18,25 @@ public class ControllerChannel {
 	    
 	
 	private String controllerUrl;
+    private String performanceUrl;
 	
 	public ControllerChannel()
 	{
-		controllerUrl = "http://" + CLI.config.getParam("globalcontroller_host") + ":" + CLI.controllerport + "/API";
+
+        if(CLI.config.getStringParam("globalcontroller","globalcontroller_host") != null)
+        {
+            if(CLI.config.getStringParam("globalcontroller","globalcontroller_port") != null)
+            {
+                controllerUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":" + CLI.config.getStringParam("globalcontroller","globalcontroller_port") + "/API";
+            }
+            else
+            {
+                controllerUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":32000/API";
+            }
+            performanceUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":32002/API";
+
+        }
+		//controllerUrl = "http://" + CLI.config.getStringParam("globalcontroller","globalcontroller_host") + ":" + CLI.config.getStringParam("globalcontroller","globalcontroller_port") + "/API";
 		
 	}
 	

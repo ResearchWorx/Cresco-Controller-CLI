@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import core.CLI;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.Direction;
@@ -39,14 +40,29 @@ public class GraphDBEngine {
 	private static GraphDatabaseService graphDb;
 	private static RestCypherQueryEngine engine;
 	
-	public GraphDBEngine(String graphdbip)
+	public GraphDBEngine()
 	{
-		
+         String host = null;
+         String dbname = null;
+
 			try
 			{
 				//graphDb = new RestGraphDatabase("http://localhost:7474/db/data");
-				graphDb = new RestGraphDatabase("http://"+ graphdbip + ":7474/db/data");
-				
+				//graphDb = new RestGraphDatabase("http://"+ graphdbip + ":7474/db/data");
+
+				host = CLI.config.getStringParam("graphdb","gdb_host");
+				String username = CLI.config.getStringParam("graphdb","gdb_username");
+				String password = CLI.config.getStringParam("graphdb","gdb_password");
+				dbname = CLI.config.getStringParam("graphdb","gdb_dbname");
+
+				//String connection_string = "remote:" + host + "/" + dbname;
+
+				graphDb = new RestGraphDatabase("http://"+ host + ":7474/db/" + dbname);
+
+
+				//factory = new OrientGraphFactory(connection_string,username,password).setupPool(10, 100);
+
+
 			}
 			catch(Exception ex)
 			{
@@ -54,7 +70,7 @@ public class GraphDBEngine {
 			}
 		
 			//engine = new RestCypherQueryEngine(new RestAPIFacade("http://localhost:7474/db/data"));
-			engine = new RestCypherQueryEngine(new RestAPIFacade("http://"+ graphdbip + ":7474/db/data"));
+			engine = new RestCypherQueryEngine(new RestAPIFacade("http://"+ host + ":7474/db/" + dbname) );
 			
 	}
 	

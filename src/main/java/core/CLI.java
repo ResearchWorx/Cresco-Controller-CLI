@@ -41,7 +41,7 @@ public class CLI {
         config = new Config(configFile);
 
 
-        gdb = new GraphDBEngine(config.getParam("gdb_host")); //create graphdb connector
+        gdb = new GraphDBEngine(); //create graphdb connector
 		
 		cc = new ControllerChannel();
 		//String pluginName = "cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar";
