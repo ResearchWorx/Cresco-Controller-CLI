@@ -23,8 +23,9 @@ public class CLI {
     public static void main(String[] args) throws Exception
 	{
         try {
+
             config = new Config(checkConfig(args));
-            gdb = new GraphDBEngine(); //create graphdb connector
+            //gdb = new GraphDBEngine(); //create graphdb connector
             cc = new ControllerChannel(); //methods to communicate with global controller
             AgentTools at = new AgentTools(); //Agent (internal controller) functions
             GlobalTools gt = new GlobalTools(); //Global (external controller) functions
@@ -35,6 +36,7 @@ public class CLI {
             else if(args[2].toLowerCase().equals("-gt")) {
                 gt.runCmd(Arrays.copyOfRange(args,3,args.length));
             }
+
 
 
         }

@@ -6,22 +6,8 @@ import org.slf4j.LoggerFactory;
 import shared.MsgEvent;
 import shared.MsgEventType;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.jar.Attributes;
-import java.util.jar.JarInputStream;
-import java.util.jar.Manifest;
-
-
-import java.util.Random;
 
 
 public class AgentTools {
@@ -32,6 +18,38 @@ public class AgentTools {
 
     }
 
+    public void runCmd(String[] args) {
+        try {
+            int cmd = Integer.parseInt(args[0]);
+            System.out.println("CMD=" + cmd);
+            if(args.length > 1) {
+                args = Arrays.copyOfRange(args, 1, args.length);
+                for(int i = 0; i < args.length; i++) {
+                    System.out.println(i + "=" + args[i]);
+                }
+            }
+
+            switch (cmd) {
+                case 0:
+                    getPluginInventory(args[0], args[1]);
+                    break;
+                case 1:
+                    break;
+                default:
+                    printCmd();
+            }
+
+        } catch (Exception ex) {
+            printCmd();
+            logger.error(ex.getMessage());
+        }
+
+    }
+
+    public void printCmd() {
+        System.out.println("0=[getPluginInventory(String region, String agent)]");
+    }
+    /*
     public void runCmd(String[] args) {
         try {
             logger.info("Running AgentTools Command: " + args[0]);
@@ -56,7 +74,7 @@ public class AgentTools {
         }
 
     }
-
+    */
     public void createApp() {
         System.out.println("Creating demo_app");
 
@@ -174,6 +192,7 @@ public class AgentTools {
         return CLI.cc.sendMsgEvent(me);
     }
 
+    /*
     public boolean getPluginInventory(String region, String agent) {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, region, null, null, "get plugin inventory");
         me.setParam("src_region", region);
@@ -183,6 +202,19 @@ public class AgentTools {
         me.setParam("controllercmd", "regioncmd");
         me.setParam("configtype", "plugininventory");
         return CLI.cc.sendMsgEvent(me);
+    }
+    */
+
+    public void getPluginInventory(String region, String agent) {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, region, null, null, "get plugin inventory");
+        me.setParam("src_region", region);
+        me.setParam("src_agent", "external");
+        me.setParam("dst_region", region);
+        me.setParam("dst_agent", agent);
+        me.setParam("controllercmd", "regioncmd");
+        me.setParam("configtype", "plugininventory");
+        MsgEvent re = CLI.cc.sendMsgEventReturn(me);
+        System.out.println(re.getParams());
     }
 
     public boolean removePlugin(String region, String agent, String plugin) {

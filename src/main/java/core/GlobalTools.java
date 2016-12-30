@@ -6,13 +6,7 @@ import org.slf4j.LoggerFactory;
 import shared.MsgEvent;
 import shared.MsgEventType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class GlobalTools {
@@ -25,11 +19,36 @@ public class GlobalTools {
 
     public void runCmd(String[] args) {
         try {
+            int cmd = Integer.parseInt(args[0]);
+            System.out.println("CMD=" + cmd);
+            if(args.length > 1) {
+                args = Arrays.copyOfRange(args, 1, args.length);
+                for(int i = 0; i < args.length; i++) {
+                    System.out.println(i + "=" + args[i]);
+                }
+            }
+
+            switch (cmd) {
+                case 0:
+                    pControllerPluginInventory();
+                    break;
+                case 1:
+                    pControllerResourceInventory();
+                    break;
+                default:
+                    printCmd();
+            }
 
         } catch (Exception ex) {
+            printCmd();
             logger.error(ex.getMessage());
         }
 
+    }
+
+    public void printCmd() {
+        System.out.println("0=[pControllerPluginInventory()]");
+        System.out.println("1=[pControllerResourceInventory()]");
     }
 
     public String getEnvStatus(String environment_id, String environment_value) {
@@ -153,6 +172,15 @@ public class GlobalTools {
         return false;
     }
 
+    public void pControllerPluginInventory() {
+        List<String> inventory = getControllerPluginInventory();
+        System.out.println("inventory list = " + inventory.size());
+        for (String str : inventory) {
+            System.out.println("inventory item = " + str);
+        }
+
+    }
+
     public List<String> getControllerPluginInventory() {
         List<String> inventory = new ArrayList<String>();
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get plugin inventory");
@@ -163,6 +191,7 @@ public class GlobalTools {
         me.setParam("globalcmd", "plugininventory");
         //return CLI.cc.sendMsgEvent(me);
         me = CLI.cc.sendMsgEventReturn(me);
+        System.out.println(me.getParams().toString());
         if (me.getParam("pluginlist") != null) {
             String[] pluginList = me.getParam("pluginlist").split(",");
             for (String str : pluginList) {
@@ -170,6 +199,15 @@ public class GlobalTools {
             }
         }
         return inventory;
+    }
+
+    public void pControllerResourceInventory() {
+        List<String> inventory = getControllerResourceInventory();
+        System.out.println("inventory list = " + inventory.size());
+        for (String str : inventory) {
+            System.out.println("inventory item = " + str);
+        }
+
     }
 
     public List<String> getControllerResourceInventory() {
@@ -181,7 +219,11 @@ public class GlobalTools {
         //me.setParam("dst_agent", "external");
         me.setParam("globalcmd", "resourceinventory");
         //return CLI.cc.sendMsgEvent(me);
+
         me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+
         /*
 		if(me.getParam("pluginlist") != null)
 		{

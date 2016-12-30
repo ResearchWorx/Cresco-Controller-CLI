@@ -70,6 +70,7 @@ public class ControllerChannel {
  
 			//add request header
 			con.setRequestProperty("User-Agent", USER_AGENT);
+			con.setRequestProperty("service_key", "123");
  
 			int responseCode = con.getResponseCode();
 			
