@@ -1,6 +1,11 @@
 package core;
 
 
+import app.gEdge;
+import app.gNode;
+import app.gPayload;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import shared.MsgEvent;
@@ -35,6 +40,8 @@ public class GlobalTools {
                 case 1:
                     pControllerResourceInventory();
                     break;
+                case 2:
+                    gPipelineSubmit();
                 default:
                     printCmd();
             }
@@ -49,6 +56,7 @@ public class GlobalTools {
     public void printCmd() {
         System.out.println("0=[pControllerPluginInventory()]");
         System.out.println("1=[pControllerResourceInventory()]");
+        System.out.println("2=[gPipelineSubmit()]");
     }
 
     public String getEnvStatus(String environment_id, String environment_value) {
@@ -201,6 +209,7 @@ public class GlobalTools {
         return inventory;
     }
 
+
     public void pControllerResourceInventory() {
         List<String> inventory = getControllerResourceInventory();
         System.out.println("inventory list = " + inventory.size());
@@ -209,6 +218,40 @@ public class GlobalTools {
         }
 
     }
+
+    public void gPipelineSubmit() {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", "gpipelinesubmit");
+
+        Gson gson = new GsonBuilder().create();
+
+
+        //public gNode(String type, String node_name, String node_id,Map<String, String> params)
+        gNode n0 = new gNode("dummy", "node0", "0", new HashMap<String,String>());
+        gNode n1 = new gNode("dummy", "node0", "1", new HashMap<String,String>());
+
+        List<gNode> gNodes = new ArrayList<>();
+        gNodes.add(n0);
+        gNodes.add(n1);
+
+        gEdge e0 = new gEdge("0","0","1");
+
+        List<gEdge> gEdges = new ArrayList<>();
+        gEdges.add(e0);
+
+        gPayload gpay = new gPayload(gNodes,gEdges);
+
+        me.setParam("gpipeline",gson.toJson(gpay));
+        //gPayload me = gson.fromJson(json, gPayload.class);
+        //System.out.println(p);
+        //return gson.toJson(gpay);
+
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+
+    }
+
 
     public List<String> getControllerResourceInventory() {
         List<String> inventory = new ArrayList<String>();
