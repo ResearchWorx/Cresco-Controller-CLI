@@ -248,8 +248,8 @@ public class GlobalTools {
 
         me = CLI.cc.sendMsgEventReturn(me);
 
-        System.out.println(me.getParams().toString());
-
+        //System.out.println(me.getParams().toString());
+        System.out.println("SUBMITTED");
     }
 
 
