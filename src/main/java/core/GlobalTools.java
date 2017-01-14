@@ -240,7 +240,8 @@ public class GlobalTools {
         gEdges.add(e0);
 
         gPayload gpay = new gPayload(gNodes,gEdges);
-
+        gpay.pipeline_id = "0";
+        gpay.pipeline_name = "demo_pipeline";
         me.setParam("gpipeline",gson.toJson(gpay));
         //gPayload me = gson.fromJson(json, gPayload.class);
         //System.out.println(p);
