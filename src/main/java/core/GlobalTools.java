@@ -42,6 +42,7 @@ public class GlobalTools {
                     break;
                 case 2:
                     gPipelineSubmit();
+                    break;
                 default:
                     printCmd();
             }
@@ -222,9 +223,9 @@ public class GlobalTools {
     public void gPipelineSubmit() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
         me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("tenant_id","0");
 
         Gson gson = new GsonBuilder().create();
-
 
         //public gNode(String type, String node_name, String node_id,Map<String, String> params)
         gNode n0 = new gNode("dummy", "node0", "0", new HashMap<String,String>());
