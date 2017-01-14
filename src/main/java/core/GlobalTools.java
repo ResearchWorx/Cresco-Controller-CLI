@@ -209,7 +209,7 @@ public class GlobalTools {
         return inventory;
     }
 
-
+//
     public void pControllerResourceInventory() {
         List<String> inventory = getControllerResourceInventory();
         System.out.println("inventory list = " + inventory.size());
