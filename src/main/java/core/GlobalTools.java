@@ -261,16 +261,10 @@ public class GlobalTools {
         Map<String,String> n0Params = new HashMap<>();
         n0Params.put("pluginname","cresco-sysinfo-plugin");
         n0Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
-        n0Params.put("ampq_control_username","cresco");
-        n0Params.put("ampq_control_password","u$cresco01");
-        n0Params.put("watchdogtimer","5000");
 
         Map<String,String> n1Params = new HashMap<>();
         n1Params.put("pluginname","cresco-sysinfo-plugin");
         n1Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
-        n1Params.put("ampq_control_username","cresco");
-        n1Params.put("ampq_control_password","u$cresco01");
-        n1Params.put("watchdogtimer","5000");
 
         gNode n0 = new gNode("dummy", "node0", "0", n0Params);
         gNode n1 = new gNode("dummy", "node0", "1", n1Params);
