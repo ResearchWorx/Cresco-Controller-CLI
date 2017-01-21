@@ -250,7 +250,8 @@ public class GlobalTools {
 
     }
 
-    public void gPipelineSubmit() {
+
+    public void gPipelineSubmit2() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
         me.setParam("globalcmd", "gpipelinesubmit");
         me.setParam("tenant_id","0");
@@ -272,6 +273,48 @@ public class GlobalTools {
         List<gNode> gNodes = new ArrayList<>();
         gNodes.add(n0);
         gNodes.add(n1);
+
+        gEdge e0 = new gEdge("0","0","1");
+
+        List<gEdge> gEdges = new ArrayList<>();
+        gEdges.add(e0);
+
+        gPayload gpay = new gPayload(gNodes,gEdges);
+        gpay.pipeline_id = "0";
+        gpay.pipeline_name = "demo_pipeline";
+        me.setParam("gpipeline",gson.toJson(gpay));
+        //gPayload me = gson.fromJson(json, gPayload.class);
+        //System.out.println(p);
+        //return gson.toJson(gpay);
+
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+        System.out.println("SUBMITTED");
+    }
+
+    public void gPipelineSubmit() {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("tenant_id","0");
+
+        Gson gson = new GsonBuilder().create();
+
+        //public gNode(String type, String node_name, String node_id,Map<String, String> params)
+        Map<String,String> n0Params = new HashMap<>();
+        n0Params.put("pluginname","cresco-container-plugin");
+        n0Params.put("jarfile","cresco-container-plugin-0.1.0.jar");
+        n0Params.put("container_image","rabbitmq:3-management");
+        n0Params.put("e_parms","RABBITMQ_DEFAULT_USER,RABBITMQ_DEFAULT_PASS");
+        n0Params.put("RABBITMQ_DEFAULT_USER","user");
+        n0Params.put("RABBITMQ_DEFAULT_PASS","password");
+        n0Params.put("p_parms","5672,15672");
+        n0Params.put("location","0");
+
+        gNode n0 = new gNode("dummy", "node0", "0", n0Params);
+
+        List<gNode> gNodes = new ArrayList<>();
+        gNodes.add(n0);
 
         gEdge e0 = new gEdge("0","0","1");
 
