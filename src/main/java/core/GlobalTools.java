@@ -302,6 +302,8 @@ public class GlobalTools {
 
         //public gNode(String type, String node_name, String node_id,Map<String, String> params)
         Map<String,String> n0Params = new HashMap<>();
+
+        /*
         n0Params.put("pluginname","cresco-container-plugin");
         n0Params.put("jarfile","cresco-container-plugin-0.1.0.jar");
         n0Params.put("container_image","rabbitmq:3-management");
@@ -310,6 +312,10 @@ public class GlobalTools {
         n0Params.put("RABBITMQ_DEFAULT_PASS","password");
         n0Params.put("p_parms","5672,15672");
         n0Params.put("location","0");
+        */
+
+        n0Params.put("pluginname","cresco-sysinfo-plugin");
+        n0Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
 
         gNode n0 = new gNode("dummy", "node0", "0", n0Params);
 
