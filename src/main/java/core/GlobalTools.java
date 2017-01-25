@@ -250,6 +250,59 @@ public class GlobalTools {
 
     }
 
+    public void gPipelineSubmit3() {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("tenant_id","0");
+
+        Gson gson = new GsonBuilder().create();
+
+        //public gNode(String type, String node_name, String node_id,Map<String, String> params)
+        Map<String,String> n0Params = new HashMap<>();
+        n0Params.put("pluginname","p0");
+        n0Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
+        n0Params.put("location","0");
+
+        Map<String,String> n1Params = new HashMap<>();
+        n1Params.put("pluginname","p1");
+        n1Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
+
+        Map<String,String> n2Params = new HashMap<>();
+        n2Params.put("pluginname","p2");
+        n2Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
+
+        Map<String,String> n3Params = new HashMap<>();
+        n3Params.put("pluginname","p3");
+        n3Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
+
+
+        gNode n0 = new gNode("dummy", "node0", "0", n0Params);
+        gNode n1 = new gNode("dummy", "node1", "1", n1Params);
+        gNode n2 = new gNode("dummy", "node2", "2", n2Params);
+        gNode n3 = new gNode("dummy", "node3", "3", n3Params);
+
+        List<gNode> gNodes = new ArrayList<>();
+        gNodes.add(n0);
+        gNodes.add(n1);
+        gNodes.add(n2);
+
+
+        gEdge e0 = new gEdge("0","0","1");
+
+        List<gEdge> gEdges = new ArrayList<>();
+        gEdges.add(e0);
+
+        gPayload gpay = new gPayload(gNodes,gEdges);
+        gpay.pipeline_id = "0";
+        gpay.pipeline_name = "demo_pipeline";
+
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+        System.out.println("SUBMITTED");
+    }
+
+
 
     public void gPipelineSubmit2() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
