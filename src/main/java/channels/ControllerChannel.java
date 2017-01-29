@@ -1,10 +1,12 @@
 package channels;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,8 +47,7 @@ public class ControllerChannel {
 		System.out.println("Global Controller URL: " + controllerUrl);
 	}
 	
-	public MsgEvent sendMsgEventReturn(MsgEvent le)
-    {
+	public MsgEvent sendMsgEventReturn(MsgEvent le) {
 		MsgEvent me = null;
 		
 		try
@@ -109,7 +110,58 @@ public class ControllerChannel {
 			return me;
 		}
 	}
- 
+
+	public MsgEvent sendJSONReturn(String urlString, String JSON) {
+		MsgEvent me = null;
+	    try
+		{
+			//String urlParameters  = "param1=a&param2=b&param3=c";
+			byte[] postData       = JSON.getBytes( StandardCharsets.UTF_8 );
+			int    postDataLength = postData.length;
+			//String request        = "http://example.com/index.php";
+			URL    url            = new URL( controllerUrl + urlString );
+			HttpURLConnection con= (HttpURLConnection) url.openConnection();
+			con.setDoOutput( true );
+			con.setInstanceFollowRedirects( false );
+			con.setRequestMethod( "POST" );
+			con.setRequestProperty("User-Agent", USER_AGENT);
+			con.setRequestProperty("service_key", "123");
+			con.setRequestProperty( "Content-Type", "application/json");
+			con.setRequestProperty( "charset", "utf-8");
+			con.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
+			con.setUseCaches( false );
+			try( DataOutputStream wr = new DataOutputStream( con.getOutputStream())) {
+				wr.write( postData );
+			}
+
+			con.setConnectTimeout(5000);
+
+			//add request header
+
+			int responseCode = con.getResponseCode();
+
+			if(responseCode == 200) {
+				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				String inputLine;
+				StringBuffer response = new StringBuffer();
+
+				while ((inputLine = in.readLine()) != null) {
+					response.append(inputLine);
+				}
+				in.close();
+                me = meFromJson(response.toString());
+				//returnString = response.toString();
+			}
+
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Controller : ControllerChannel : sendControllerLog : " + ex.toString());
+		}
+		return me;
+	}
+
+
 	public boolean sendMsgEvent(MsgEvent le)
     {
 		try

@@ -11,8 +11,12 @@ import org.slf4j.LoggerFactory;
 import shared.MsgEvent;
 import shared.MsgEventType;
 
+import javax.xml.bind.DatatypeConverter;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.zip.GZIPOutputStream;
 
 public class GlobalTools {
 
@@ -48,6 +52,15 @@ public class GlobalTools {
                     break;
                 case 3:
                     getGpipeline();
+                    break;
+                case 4:
+                    printGpipelineList();
+                    break;
+                case 5:
+                    removeGpipeline();
+                    break;
+                case 6:
+                    removeAllPipelines();
                     break;
                 default:
                     printCmd();
@@ -226,7 +239,105 @@ public class GlobalTools {
 
     }
 
+    public void removeAllPipelines() {
 
+        for(String pipelineId : getGpipelineList() ) {
+            System.out.println("Removing Pipeline_id: " + pipelineId);
+            removeGpipeline(pipelineId);
+        }
+    }
+
+    public List<String> getGpipelineList() {
+
+        List<String> pipelineList = null;
+        try {
+            pipelineList = new ArrayList<>();
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "getgpipelinelist");
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if (me == null) {
+                System.out.println("Can't get gpipeline");
+            } else {
+                if (me.getParam("gpipeline_ids") != null) {
+                    String pipelineIdString = me.getParam("gpipeline_ids");
+                    //System.out.println(pipelineIdString);
+                    if(pipelineIdString.contains(",")) {
+                        String[] pipelineIds = pipelineIdString.split(",");
+                        for(String pipelineId : pipelineIds) {
+                            pipelineList.add(pipelineId);
+                        }
+                    }
+                    else {
+                        pipelineList.add(pipelineIdString);
+                    }
+                }
+                //System.out.println(me.getParams().toString());
+            }
+        }
+        catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        return pipelineList;
+    }
+
+
+    public void printGpipelineList() {
+
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "getgpipelinelist");
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                if(me.getParam("gpipeline_ids") != null) {
+                    String pipelineIdString = me.getParam("gpipeline_ids");
+                    System.out.println(pipelineIdString);
+                }
+                //System.out.println(me.getParams().toString());
+            }
+    }
+
+    public void removeGpipeline(String pipelineId) {
+        //String pipelineId = args[1];
+
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "gpipelineremove");
+            me.setParam("pipeline_id", pipelineId);
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                System.out.println(me.getParams().toString());
+            }
+
+    }
+
+    public void removeGpipeline() {
+        System.out.println("args = " + args.length + " " + args[1]);
+        String pipelineId = args[1];
+        if(pipelineId == null) {
+            System.out.println("Please enter pipeline_id");
+        }
+        else {
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "gpipelineremove");
+            me.setParam("pipeline_id", args[1]);
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                System.out.println(me.getParams().toString());
+            }
+        }
+
+    }
 
     public void getGpipeline() {
         System.out.println("args = " + args.length + " " + args[1]);
@@ -302,8 +413,6 @@ public class GlobalTools {
         System.out.println("SUBMITTED");
     }
 
-
-
     public void gPipelineSubmit2() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
         me.setParam("globalcmd", "gpipelinesubmit");
@@ -367,15 +476,35 @@ public class GlobalTools {
         n0Params.put("location","0");
         */
 
-        n0Params.put("pluginname","cresco-sysinfo-plugin");
-        n0Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
-
-        gNode n0 = new gNode("dummy", "node0", "0", n0Params);
+        n0Params.put("pluginname","cresco-container-plugin");
+        n0Params.put("jarfile","cresco-container-plugin-0.1.0.jar");
+        n0Params.put("container_image", "gitlab.rc.uky.edu:4567/cresco/cresco-container");
+        //CRESCO_GC_HOST
+        //CRESCO_LOCATION
+        n0Params.put("e_params","CRESCO_LOCATION=home");
+        //n0Params.put("location_region","home");
+        //n0Params.put("location_agent","home");
+        //n0Params.put("location","master");
 
         List<gNode> gNodes = new ArrayList<>();
-        gNodes.add(n0);
 
-        gEdge e0 = new gEdge("0","0","1");
+        if(args[1] != null) {
+            int count = Integer.parseInt(args[1]);
+            for(int i = 0; i < count; i++) {
+                gNodes.add(new gNode("dummy", "node" + String.valueOf(i), String.valueOf(i), n0Params));
+            }
+        }
+        else {
+            gNodes.add(new gNode("dummy", "node0", "0", n0Params));
+        }
+
+
+        //gNode n0 = new gNode("dummy", "node0", "0", n0Params);
+
+        //List<gNode> gNodes = new ArrayList<>();
+        //gNodes.add(n0);
+
+        gEdge e0 = new gEdge("0","1000000","1000000");
 
         List<gEdge> gEdges = new ArrayList<>();
         gEdges.add(e0);
@@ -383,17 +512,62 @@ public class GlobalTools {
         gPayload gpay = new gPayload(gNodes,gEdges);
         gpay.pipeline_id = "0";
         gpay.pipeline_name = "demo_pipeline";
-        me.setParam("gpipeline",gson.toJson(gpay));
+
+        String compressedGpay = DatatypeConverter.printBase64Binary(stringCompress(gson.toJson(gpay)));
+
+        me.setParam("gpipeline_compressed",String.valueOf(Boolean.TRUE));
+
+        me.setParam("gpipeline",compressedGpay);
         //gPayload me = gson.fromJson(json, gPayload.class);
         //System.out.println(p);
         //return gson.toJson(gpay);
 
-        me = CLI.cc.sendMsgEventReturn(me);
-
         System.out.println(me.getParams().toString());
-        System.out.println("SUBMITTED");
+
+        //me = CLI.cc.sendMsgEventReturn(me);
+
+        me = CLI.cc.sendJSONReturn("/addgpipeline",gson.toJson(me));
+
+        //ce.setParam("gpipeline_id",gpay.pipeline_id);
+        //System.out.println(returnString);
+        //System.out.println("SUBMITTED");
+        System.out.println("PipelineId =" +  me.getParam("gpipeline_id"));
     }
 
+    public byte[] stringCompress(String str) {
+        byte[] dataToCompress = str.getBytes(StandardCharsets.UTF_8);
+        byte[] compressedData = null;
+        try
+        {
+            ByteArrayOutputStream byteStream =
+                    new ByteArrayOutputStream(dataToCompress.length);
+            try
+            {
+                GZIPOutputStream zipStream =
+                        new GZIPOutputStream(byteStream);
+                try
+                {
+                    zipStream.write(dataToCompress);
+                }
+                finally
+                {
+                    zipStream.close();
+                }
+            }
+            finally
+            {
+                byteStream.close();
+            }
+
+            compressedData = byteStream.toByteArray();
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        return compressedData;
+    }
 
     public List<String> getControllerResourceInventory() {
         List<String> inventory = new ArrayList<String>();
@@ -422,7 +596,6 @@ public class GlobalTools {
         return inventory;
     }
 
-
     public void getPluginInfo(String plugin_id) {
         List<String> inventory = new ArrayList<String>();
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get plugin info");
@@ -439,7 +612,6 @@ public class GlobalTools {
         }
 
     }
-
 
     public static <K extends Comparable, V extends Comparable> Map<K, V> sortByValues(Map<K, V> map) {
         List<Entry<K, V>> entries = new LinkedList<Entry<K, V>>(map.entrySet());
