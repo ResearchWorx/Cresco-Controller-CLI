@@ -485,6 +485,7 @@ public class GlobalTools {
         //n0Params.put("location_region","home");
         //n0Params.put("location_agent","home");
         //n0Params.put("location","master");
+        n0Params.put("location","home");
 
         List<gNode> gNodes = new ArrayList<>();
 
