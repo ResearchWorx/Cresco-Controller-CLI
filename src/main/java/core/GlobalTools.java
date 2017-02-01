@@ -54,12 +54,15 @@ public class GlobalTools {
                     getGpipeline();
                     break;
                 case 4:
-                    printGpipelineList();
+                    getGpipelineStatus();
                     break;
                 case 5:
-                    removeGpipeline();
+                    printGpipelineList();
                     break;
                 case 6:
+                    removeGpipeline();
+                    break;
+                case 7:
                     removeAllPipelines();
                     break;
                 default:
@@ -361,6 +364,54 @@ public class GlobalTools {
 
     }
 
+    public String getGpipelineStatus(String pipelineId) {
+        String pipelineStatus = null;
+        if(pipelineId == null) {
+            System.out.println("Please enter pipeline_id");
+        }
+        else {
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "getgpipelinestatus");
+            me.setParam("pipeline_id", pipelineStatus);
+            me = CLI.cc.sendMsgEventReturn(me);
+
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                //System.out.println(me.getParams().toString());
+                if(me.getParam("status_code") != null) {
+                pipelineStatus =   me.getParam("status_code");
+                }
+            }
+        }
+        return pipelineStatus;
+    }
+
+    public void getGpipelineStatus() {
+        System.out.println("args = " + args.length + " " + args[1]);
+        String pipelineId = args[1];
+        if(pipelineId == null) {
+            System.out.println("Please enter pipeline_id");
+        }
+        else {
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "getgpipelinestatus");
+            me.setParam("pipeline_id", args[1]);
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                System.out.println(me.getParams().toString());
+            }
+        }
+
+    }
+
+
     public void gPipelineSubmit3() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
         me.setParam("globalcmd", "gpipelinesubmit");
@@ -481,11 +532,19 @@ public class GlobalTools {
         n0Params.put("container_image", "gitlab.rc.uky.edu:4567/cresco/cresco-container");
         //CRESCO_GC_HOST
         //CRESCO_LOCATION
-        n0Params.put("e_params","CRESCO_LOCATION=home");
+        //n0Params.put("e_params","CRESCO_LOCATION=home,CRESCO_AGENT_DISC_TIMEOUT=2000");
         //n0Params.put("location_region","home");
         //n0Params.put("location_agent","home");
         //n0Params.put("location","master");
-        n0Params.put("location","home");
+        if(args.length == 3) {
+            n0Params.put("location",args[2]);
+            n0Params.put("e_params","CRESCO_LOCATION=" + args[2] + ",CRESCO_AGENT_DISC_TIMEOUT=2000");
+        }
+        else {
+            n0Params.put("location","home");
+            n0Params.put("e_params","CRESCO_LOCATION=home,CRESCO_AGENT_DISC_TIMEOUT=2000");
+
+        }
 
         List<gNode> gNodes = new ArrayList<>();
 
