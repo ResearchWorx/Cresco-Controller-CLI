@@ -175,6 +175,7 @@ public class ControllerChannel {
 				type = le.getMsgType().toString();
 			}
 			String url = controllerUrl + urlFromMsg(type,leMap);
+			System.out.println("url: [" + url + "]");
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
  
