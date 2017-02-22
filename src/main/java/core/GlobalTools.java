@@ -534,10 +534,10 @@ public class GlobalTools {
             n0Params.put("pluginname", "cresco-container-plugin");
             n0Params.put("jarfile", "cresco-container-plugin-0.1.0.jar");
             n0Params.put("container_image", "rabbitmq:3-management");
-            n0Params.put("e_parms", "RABBITMQ_DEFAULT_USER:RABBITMQ_DEFAULT_PASS");
+            n0Params.put("e_param", "RABBITMQ_DEFAULT_USER:RABBITMQ_DEFAULT_PASS");
             n0Params.put("RABBITMQ_DEFAULT_USER", "admin");
             n0Params.put("RABBITMQ_DEFAULT_PASS", "cody01");
-            n0Params.put("p_parms", "5672:15672");
+            n0Params.put("p_param", "5672:15672");
             n0Params.put("location", location);
 
             gNodes.add(new gNode("dummy", "node" + String.valueOf(count), String.valueOf(count), n0Params));
