@@ -768,25 +768,17 @@ public class GlobalTools {
             n0Params.put("path_stage","1");
             n0Params.put("location", location);
             */
-            /*
+
             n0Params.put("pluginname", "cresco-container-plugin");
             n0Params.put("jarfile", "cresco-container-plugin-0.1.0.jar");
             n0Params.put("container_image", "gitlab.rc.uky.edu:4567/cresco/pp");
             n0Params.put("e_params", "CRESCO_path_stage:CRESCO_cop_id:CRESCO_pp_amqp_host:CRESCO_pp_amqp_username:CRESCO_pp_amqp_password");
-            n0Params.put("RABBITMQ_DEFAULT_USER", "admin");
-            n0Params.put("RABBITMQ_DEFAULT_PASS", "cody01");
-            n0Params.put("p_params", "5672:15672");
-            n0Params.put("location", location);
-            */
-
             n0Params.put("CRESCO_path_stage","1");
             n0Params.put("CRESCO_cop_id","cop-"+location);
             n0Params.put("CRESCO_pp_amqp_host","128.163.202." + location);
             n0Params.put("CRESCO_pp_amqp_username","admin");
             n0Params.put("CRESCO_pp_amqp_password","cody01");
             n0Params.put("location", location);
-
-
 
             gNodes.add(new gNode("dummy", "node" + String.valueOf(count), String.valueOf(count), n0Params));
             count++;
