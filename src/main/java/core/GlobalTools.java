@@ -349,6 +349,8 @@ public class GlobalTools {
             n0Params.put("CRESCO_pp_amqp_username","admin");
             n0Params.put("CRESCO_pp_amqp_password","cody01");
             n0Params.put("location", location);
+            n0Params.put("CRESCO_discovery_secret_agent","cresco_discovery_secret" + location);
+
 
             gNodes.add(new gNode("dummy", "node" + String.valueOf(count), String.valueOf(count), n0Params));
             count++;
