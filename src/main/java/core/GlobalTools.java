@@ -85,436 +85,6 @@ public class GlobalTools {
 
     }
 
-    public void printCmd() {
-        System.out.println("0=[pControllerPluginInventory()]");
-        System.out.println("1=[pControllerResourceInventory()]");
-        System.out.println("2=[gPipelineSubmit()]");
-    }
-
-    public String getEnvStatus(String environment_id, String environment_value) {
-        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "getenvstatus");
-        me.setParam("globalcmd", "getenvstatus");
-        me.setParam("environment_id", environment_id);
-        me.setParam("environment_value", environment_value);
-        me = CLI.cc.sendMsgEventReturn(me);
-
-        if (me.getParam("count") != null) {
-            System.out.println("environment_id=" + me.getParam("count"));
-            return me.getParam("count");
-        }
-        return null;
-    }
-
-    public String addPlugin(String resource_id, String inode_id, String configParams) {
-        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "add application node");
-        //me.setParam("src_region", "external");
-        //me.setParam("src_agent", "external");
-        //me.setParam("dst_region", "external");
-        //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "addplugin");
-        me.setParam("inode_id", inode_id);
-        me.setParam("resource_id", resource_id);
-        me.setParam("configparams", configParams);
-        //return CLI.cc.sendMsgEvent(me);
-        me = CLI.cc.sendMsgEventReturn(me);
-        //me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=" + region  + ",watchdogtimer=5000");
-
-        if (me.getParam("status_code") != null) {
-            System.out.println("status_desc:" + me.getParam("status_desc"));
-            return me.getParam("status_code");
-        }
-        return null;
-    }
-
-    public String removePlugin(String resource_id, String inode_id) {
-        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "remove application node");
-        //me.setParam("src_region", "external");
-        //me.setParam("src_agent", "external");
-        //me.setParam("dst_region", "external");
-        //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "removeplugin");
-        me.setParam("inode_id", inode_id);
-        me.setParam("resource_id", resource_id);
-
-        //return CLI.cc.sendMsgEvent(me);
-        me = CLI.cc.sendMsgEventReturn(me);
-        //me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=" + region  + ",watchdogtimer=5000");
-
-        if (me.getParam("status_code") != null) {
-            System.out.println("status_desc:" + me.getParam("status_desc"));
-
-            return me.getParam("status_code");
-        }
-        return null;
-    }
-
-    public String getPluginStatus(String resource_id, String inode_id) {
-        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "add application node");
-        //me.setParam("src_region", "external");
-        //me.setParam("src_agent", "external");
-        //me.setParam("dst_region", "external");
-        //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "getpluginstatus");
-        me.setParam("inode_id", inode_id);
-        me.setParam("resource_id", resource_id);
-
-        //return CLI.cc.sendMsgEvent(me);
-        me = CLI.cc.sendMsgEventReturn(me);
-        //me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=" + region  + ",watchdogtimer=5000");
-        System.out.println(me.getMsgBody());
-
-        if (me.getParam("status_code") != null) {
-            System.out.println("status_desc:" + me.getParam("status_desc"));
-            return me.getParam("status_code");
-        }
-        return null;
-    }
-
-    public void updatePlugins(boolean force) {
-        String pluginName = "cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar";
-        String downloadUrl = "http://128.163.188.129:9998/job/Cresco-Agent-Dummy-Plugin/lastSuccessfulBuild/com.researchworx.cresco$cresco-agent-dummy-plugin/artifact/com.researchworx.cresco/cresco-agent-dummy-plugin/0.5.0-SNAPSHOT/";
-        controllerPluginDownload(pluginName, downloadUrl, force);
-
-        downloadUrl = "http://128.163.188.129:9998/job/Cresco-Agent-AMPQChannel-Plugin/lastSuccessfulBuild/com.researchworx.cresco$cresco-agent-ampqchannel-plugin/artifact/com.researchworx.cresco/cresco-agent-ampqchannel-plugin/0.5.0-SNAPSHOT/";
-        pluginName = "cresco-agent-ampqchannel-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar";
-
-        controllerPluginDownload(pluginName, downloadUrl, force);
-
-
-        List<String> inventory = getControllerPluginInventory();
-        System.out.println("inventory list = " + inventory.size());
-        for (String str : inventory) {
-            System.out.println("inventory item = " + str);
-        }
-
-
-    }
-
-    public boolean controllerPluginDownload(String plugin, String pluginurl, boolean forceDownload) {
-        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "download plugin");
-        //me.setParam("src_region", "external");
-        //me.setParam("src_agent", "external");
-        //me.setParam("dst_region", "external");
-        //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "plugindownload");
-        me.setParam("plugin", plugin);
-        me.setParam("pluginurl", pluginurl);
-        if (forceDownload) {
-            me.setParam("forceplugindownload", "true");
-        }
-        //return CLI.cc.sendMsgEvent(me);
-        me = CLI.cc.sendMsgEventReturn(me);
-        if (me.getParam("hasplugin") != null) {
-            if (me.getParam("hasplugin").equals(plugin)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void pControllerPluginInventory() {
-        List<String> inventory = getControllerPluginInventory();
-        System.out.println("inventory list = " + inventory.size());
-        for (String str : inventory) {
-            System.out.println("inventory item = " + str);
-        }
-
-    }
-
-    public List<String> getControllerPluginInventory() {
-        List<String> inventory = new ArrayList<String>();
-        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get plugin inventory");
-        //me.setParam("src_region", "external");
-        //me.setParam("src_agent", "external");
-        //me.setParam("dst_region", "external");
-        //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "plugininventory");
-        //return CLI.cc.sendMsgEvent(me);
-        me = CLI.cc.sendMsgEventReturn(me);
-        System.out.println(me.getParams().toString());
-        if (me.getParam("pluginlist") != null) {
-            String[] pluginList = me.getParam("pluginlist").split(",");
-            for (String str : pluginList) {
-                inventory.add(str);
-            }
-        }
-        return inventory;
-    }
-
-//
-    public void pControllerResourceInventory() {
-        List<String> inventory = getControllerResourceInventory();
-        System.out.println("inventory list = " + inventory.size());
-        for (String str : inventory) {
-            System.out.println("inventory item = " + str);
-        }
-
-    }
-
-    public void removeAllPipelines() {
-
-        for(String pipelineId : getGpipelineList() ) {
-            System.out.println("Removing Pipeline_id: " + pipelineId);
-            removeGpipeline(pipelineId);
-        }
-    }
-
-    public List<String> getGpipelineList() {
-
-        List<String> pipelineList = null;
-        try {
-            pipelineList = new ArrayList<>();
-            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "getgpipelinelist");
-            me = CLI.cc.sendMsgEventReturn(me);
-
-            if (me == null) {
-                System.out.println("Can't get gpipeline");
-            } else {
-                if (me.getParam("gpipeline_ids") != null) {
-                    String pipelineIdString = me.getParam("gpipeline_ids");
-                    //System.out.println(pipelineIdString);
-                    if(pipelineIdString.contains(",")) {
-                        String[] pipelineIds = pipelineIdString.split(",");
-                        for(String pipelineId : pipelineIds) {
-                            pipelineList.add(pipelineId);
-                        }
-                    }
-                    else {
-                        pipelineList.add(pipelineIdString);
-                    }
-                }
-                //System.out.println(me.getParams().toString());
-            }
-        }
-        catch(Exception ex) {
-            ex.printStackTrace();
-        }
-        return pipelineList;
-    }
-
-
-    public void printGpipelineList() {
-
-            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "getgpipelinelist");
-            me = CLI.cc.sendMsgEventReturn(me);
-
-            if(me == null) {
-                System.out.println("Can't get gpipeline");
-            }
-            else {
-                if(me.getParam("gpipeline_ids") != null) {
-                    String pipelineIdString = me.getParam("gpipeline_ids");
-                    System.out.println(pipelineIdString);
-                }
-                //System.out.println(me.getParams().toString());
-            }
-    }
-
-    public void removeGpipeline(String pipelineId) {
-        //String pipelineId = args[1];
-
-            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "gpipelineremove");
-            me.setParam("pipeline_id", pipelineId);
-            me = CLI.cc.sendMsgEventReturn(me);
-
-            if(me == null) {
-                System.out.println("Can't get gpipeline");
-            }
-            else {
-                System.out.println(me.getParams().toString());
-            }
-
-    }
-
-    public void removeGpipeline() {
-        System.out.println("args = " + args.length + " " + args[1]);
-        String pipelineId = args[1];
-        if(pipelineId == null) {
-            System.out.println("Please enter pipeline_id");
-        }
-        else {
-            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "gpipelineremove");
-            me.setParam("pipeline_id", args[1]);
-            me = CLI.cc.sendMsgEventReturn(me);
-
-            if(me == null) {
-                System.out.println("Can't get gpipeline");
-            }
-            else {
-                System.out.println(me.getParams().toString());
-            }
-        }
-
-    }
-
-    public void getGpipeline() {
-        System.out.println("args = " + args.length + " " + args[1]);
-        String pipelineId = args[1];
-        if(pipelineId == null) {
-            System.out.println("Please enter pipeline_id");
-        }
-        else {
-            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "getgpipeline");
-            me.setParam("pipeline_id", args[1]);
-            me = CLI.cc.sendMsgEventReturn(me);
-
-            if(me == null) {
-                System.out.println("Can't get gpipeline");
-            }
-            else {
-                System.out.println(me.getParams().toString());
-            }
-        }
-
-    }
-
-    public String getGpipelineStatus(String pipelineId) {
-        String pipelineStatus = null;
-        if(pipelineId == null) {
-            System.out.println("Please enter pipeline_id");
-        }
-        else {
-            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "getgpipelinestatus");
-            me.setParam("pipeline_id", pipelineStatus);
-            me = CLI.cc.sendMsgEventReturn(me);
-
-
-            if(me == null) {
-                System.out.println("Can't get gpipeline");
-            }
-            else {
-                //System.out.println(me.getParams().toString());
-                if(me.getParam("status_code") != null) {
-                pipelineStatus =   me.getParam("status_code");
-                }
-            }
-        }
-        return pipelineStatus;
-    }
-
-    public void getGpipelineStatus() {
-        System.out.println("args = " + args.length + " " + args[1]);
-        String pipelineId = args[1];
-        if(pipelineId == null) {
-            System.out.println("Please enter pipeline_id");
-        }
-        else {
-            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "getgpipelinestatus");
-            me.setParam("pipeline_id", args[1]);
-            me = CLI.cc.sendMsgEventReturn(me);
-
-            if(me == null) {
-                System.out.println("Can't get gpipeline");
-            }
-            else {
-                System.out.println(me.getParams().toString());
-            }
-        }
-
-    }
-
-
-    public void gPipelineSubmit3() {
-        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-        me.setParam("globalcmd", "gpipelinesubmit");
-        me.setParam("tenant_id","0");
-
-        Gson gson = new GsonBuilder().create();
-
-        //public gNode(String type, String node_name, String node_id,Map<String, String> params)
-        Map<String,String> n0Params = new HashMap<>();
-        n0Params.put("pluginname","p0");
-        n0Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
-        n0Params.put("location","0");
-
-        Map<String,String> n1Params = new HashMap<>();
-        n1Params.put("pluginname","p1");
-        n1Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
-
-        Map<String,String> n2Params = new HashMap<>();
-        n2Params.put("pluginname","p2");
-        n2Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
-
-        Map<String,String> n3Params = new HashMap<>();
-        n3Params.put("pluginname","p3");
-        n3Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
-
-
-        gNode n0 = new gNode("dummy", "node0", "0", n0Params);
-        gNode n1 = new gNode("dummy", "node1", "1", n1Params);
-        gNode n2 = new gNode("dummy", "node2", "2", n2Params);
-        gNode n3 = new gNode("dummy", "node3", "3", n3Params);
-
-        List<gNode> gNodes = new ArrayList<>();
-        gNodes.add(n0);
-        gNodes.add(n1);
-        gNodes.add(n2);
-
-
-        gEdge e0 = new gEdge("0","0","1");
-
-        List<gEdge> gEdges = new ArrayList<>();
-        gEdges.add(e0);
-
-        gPayload gpay = new gPayload(gNodes,gEdges);
-        gpay.pipeline_id = "0";
-        gpay.pipeline_name = "demo_pipeline";
-
-        me = CLI.cc.sendMsgEventReturn(me);
-
-        System.out.println(me.getParams().toString());
-        System.out.println("SUBMITTED");
-    }
-
-    public void gPipelineSubmit2() {
-        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-        me.setParam("globalcmd", "gpipelinesubmit");
-        me.setParam("tenant_id","0");
-
-        Gson gson = new GsonBuilder().create();
-
-        //public gNode(String type, String node_name, String node_id,Map<String, String> params)
-        Map<String,String> n0Params = new HashMap<>();
-        n0Params.put("pluginname","cresco-sysinfo-plugin");
-        n0Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
-
-        Map<String,String> n1Params = new HashMap<>();
-        n1Params.put("pluginname","cresco-sysinfo-plugin");
-        n1Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
-
-        gNode n0 = new gNode("dummy", "node0", "0", n0Params);
-        gNode n1 = new gNode("dummy", "node0", "1", n1Params);
-
-        List<gNode> gNodes = new ArrayList<>();
-        gNodes.add(n0);
-        gNodes.add(n1);
-
-        gEdge e0 = new gEdge("0","0","1");
-
-        List<gEdge> gEdges = new ArrayList<>();
-        gEdges.add(e0);
-
-        gPayload gpay = new gPayload(gNodes,gEdges);
-        gpay.pipeline_id = "0";
-        gpay.pipeline_name = "demo_pipeline";
-        me.setParam("gpipeline",gson.toJson(gpay));
-        //gPayload me = gson.fromJson(json, gPayload.class);
-        //System.out.println(p);
-        //return gson.toJson(gpay);
-
-        me = CLI.cc.sendMsgEventReturn(me);
-
-        System.out.println(me.getParams().toString());
-        System.out.println("SUBMITTED");
-    }
-
     public void addQueues() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
         me.setParam("globalcmd", "gpipelinesubmit");
@@ -852,6 +422,434 @@ public class GlobalTools {
         System.out.println("PipelineId =" +  me.getParam("gpipeline_id"));
     }
 
+
+
+
+    public void printCmd() {
+        System.out.println("0=[pControllerPluginInventory()]");
+        System.out.println("1=[pControllerResourceInventory()]");
+        System.out.println("2=[gPipelineSubmit()]");
+    }
+
+    public String getEnvStatus(String environment_id, String environment_value) {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "getenvstatus");
+        me.setParam("globalcmd", "getenvstatus");
+        me.setParam("environment_id", environment_id);
+        me.setParam("environment_value", environment_value);
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        if (me.getParam("count") != null) {
+            System.out.println("environment_id=" + me.getParam("count"));
+            return me.getParam("count");
+        }
+        return null;
+    }
+
+    public String addPlugin(String resource_id, String inode_id, String configParams) {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "add application node");
+        //me.setParam("src_region", "external");
+        //me.setParam("src_agent", "external");
+        //me.setParam("dst_region", "external");
+        //me.setParam("dst_agent", "external");
+        me.setParam("globalcmd", "addplugin");
+        me.setParam("inode_id", inode_id);
+        me.setParam("resource_id", resource_id);
+        me.setParam("configparams", configParams);
+        //return CLI.cc.sendMsgEvent(me);
+        me = CLI.cc.sendMsgEventReturn(me);
+        //me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=" + region  + ",watchdogtimer=5000");
+
+        if (me.getParam("status_code") != null) {
+            System.out.println("status_desc:" + me.getParam("status_desc"));
+            return me.getParam("status_code");
+        }
+        return null;
+    }
+
+    public String removePlugin(String resource_id, String inode_id) {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "remove application node");
+        //me.setParam("src_region", "external");
+        //me.setParam("src_agent", "external");
+        //me.setParam("dst_region", "external");
+        //me.setParam("dst_agent", "external");
+        me.setParam("globalcmd", "removeplugin");
+        me.setParam("inode_id", inode_id);
+        me.setParam("resource_id", resource_id);
+
+        //return CLI.cc.sendMsgEvent(me);
+        me = CLI.cc.sendMsgEventReturn(me);
+        //me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=" + region  + ",watchdogtimer=5000");
+
+        if (me.getParam("status_code") != null) {
+            System.out.println("status_desc:" + me.getParam("status_desc"));
+
+            return me.getParam("status_code");
+        }
+        return null;
+    }
+
+    public String getPluginStatus(String resource_id, String inode_id) {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "add application node");
+        //me.setParam("src_region", "external");
+        //me.setParam("src_agent", "external");
+        //me.setParam("dst_region", "external");
+        //me.setParam("dst_agent", "external");
+        me.setParam("globalcmd", "getpluginstatus");
+        me.setParam("inode_id", inode_id);
+        me.setParam("resource_id", resource_id);
+
+        //return CLI.cc.sendMsgEvent(me);
+        me = CLI.cc.sendMsgEventReturn(me);
+        //me.setParam("configparams", "perflevel="+ perflevel + ",pluginname=DummyPlugin,jarfile=cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar,region=" + region  + ",watchdogtimer=5000");
+        System.out.println(me.getMsgBody());
+
+        if (me.getParam("status_code") != null) {
+            System.out.println("status_desc:" + me.getParam("status_desc"));
+            return me.getParam("status_code");
+        }
+        return null;
+    }
+
+    public void updatePlugins(boolean force) {
+        String pluginName = "cresco-agent-dummy-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar";
+        String downloadUrl = "http://128.163.188.129:9998/job/Cresco-Agent-Dummy-Plugin/lastSuccessfulBuild/com.researchworx.cresco$cresco-agent-dummy-plugin/artifact/com.researchworx.cresco/cresco-agent-dummy-plugin/0.5.0-SNAPSHOT/";
+        controllerPluginDownload(pluginName, downloadUrl, force);
+
+        downloadUrl = "http://128.163.188.129:9998/job/Cresco-Agent-AMPQChannel-Plugin/lastSuccessfulBuild/com.researchworx.cresco$cresco-agent-ampqchannel-plugin/artifact/com.researchworx.cresco/cresco-agent-ampqchannel-plugin/0.5.0-SNAPSHOT/";
+        pluginName = "cresco-agent-ampqchannel-plugin-0.5.0-SNAPSHOT-jar-with-dependencies.jar";
+
+        controllerPluginDownload(pluginName, downloadUrl, force);
+
+
+        List<String> inventory = getControllerPluginInventory();
+        System.out.println("inventory list = " + inventory.size());
+        for (String str : inventory) {
+            System.out.println("inventory item = " + str);
+        }
+
+
+    }
+
+    public boolean controllerPluginDownload(String plugin, String pluginurl, boolean forceDownload) {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "download plugin");
+        //me.setParam("src_region", "external");
+        //me.setParam("src_agent", "external");
+        //me.setParam("dst_region", "external");
+        //me.setParam("dst_agent", "external");
+        me.setParam("globalcmd", "plugindownload");
+        me.setParam("plugin", plugin);
+        me.setParam("pluginurl", pluginurl);
+        if (forceDownload) {
+            me.setParam("forceplugindownload", "true");
+        }
+        //return CLI.cc.sendMsgEvent(me);
+        me = CLI.cc.sendMsgEventReturn(me);
+        if (me.getParam("hasplugin") != null) {
+            if (me.getParam("hasplugin").equals(plugin)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void pControllerPluginInventory() {
+        List<String> inventory = getControllerPluginInventory();
+        System.out.println("inventory list = " + inventory.size());
+        for (String str : inventory) {
+            System.out.println("inventory item = " + str);
+        }
+
+    }
+    public List<String> getControllerPluginInventory() {
+        List<String> inventory = new ArrayList<String>();
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get plugin inventory");
+        //me.setParam("src_region", "external");
+        //me.setParam("src_agent", "external");
+        //me.setParam("dst_region", "external");
+        //me.setParam("dst_agent", "external");
+        me.setParam("globalcmd", "plugininventory");
+        //return CLI.cc.sendMsgEvent(me);
+        me = CLI.cc.sendMsgEventReturn(me);
+        System.out.println(me.getParams().toString());
+        if (me.getParam("pluginlist") != null) {
+            String[] pluginList = me.getParam("pluginlist").split(",");
+            for (String str : pluginList) {
+                inventory.add(str);
+            }
+        }
+        return inventory;
+    }
+
+    public void pControllerResourceInventory() {
+        List<String> inventory = getControllerResourceInventory();
+        System.out.println("inventory list = " + inventory.size());
+        for (String str : inventory) {
+            System.out.println("inventory item = " + str);
+        }
+
+    }
+
+    public void removeAllPipelines() {
+
+        for(String pipelineId : getGpipelineList() ) {
+            System.out.println("Removing Pipeline_id: " + pipelineId);
+            removeGpipeline(pipelineId);
+        }
+    }
+
+    public List<String> getGpipelineList() {
+
+        List<String> pipelineList = null;
+        try {
+            pipelineList = new ArrayList<>();
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "getgpipelinelist");
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if (me == null) {
+                System.out.println("Can't get gpipeline");
+            } else {
+                if (me.getParam("gpipeline_ids") != null) {
+                    String pipelineIdString = me.getParam("gpipeline_ids");
+                    //System.out.println(pipelineIdString);
+                    if(pipelineIdString.contains(",")) {
+                        String[] pipelineIds = pipelineIdString.split(",");
+                        for(String pipelineId : pipelineIds) {
+                            pipelineList.add(pipelineId);
+                        }
+                    }
+                    else {
+                        pipelineList.add(pipelineIdString);
+                    }
+                }
+                //System.out.println(me.getParams().toString());
+            }
+        }
+        catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        return pipelineList;
+    }
+
+    public void printGpipelineList() {
+
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "getgpipelinelist");
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                if(me.getParam("gpipeline_ids") != null) {
+                    String pipelineIdString = me.getParam("gpipeline_ids");
+                    System.out.println(pipelineIdString);
+                }
+                //System.out.println(me.getParams().toString());
+            }
+    }
+
+    public void removeGpipeline(String pipelineId) {
+        //String pipelineId = args[1];
+
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "gpipelineremove");
+            me.setParam("pipeline_id", pipelineId);
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                System.out.println(me.getParams().toString());
+            }
+
+    }
+
+    public void removeGpipeline() {
+        System.out.println("args = " + args.length + " " + args[1]);
+        String pipelineId = args[1];
+        if(pipelineId == null) {
+            System.out.println("Please enter pipeline_id");
+        }
+        else {
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "gpipelineremove");
+            me.setParam("pipeline_id", args[1]);
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                System.out.println(me.getParams().toString());
+            }
+        }
+
+    }
+
+    public void getGpipeline() {
+        System.out.println("args = " + args.length + " " + args[1]);
+        String pipelineId = args[1];
+        if(pipelineId == null) {
+            System.out.println("Please enter pipeline_id");
+        }
+        else {
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "getgpipeline");
+            me.setParam("pipeline_id", args[1]);
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                System.out.println(me.getParams().toString());
+            }
+        }
+
+    }
+
+    public String getGpipelineStatus(String pipelineId) {
+        String pipelineStatus = null;
+        if(pipelineId == null) {
+            System.out.println("Please enter pipeline_id");
+        }
+        else {
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "getgpipelinestatus");
+            me.setParam("pipeline_id", pipelineStatus);
+            me = CLI.cc.sendMsgEventReturn(me);
+
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                //System.out.println(me.getParams().toString());
+                if(me.getParam("status_code") != null) {
+                pipelineStatus =   me.getParam("status_code");
+                }
+            }
+        }
+        return pipelineStatus;
+    }
+
+    public void getGpipelineStatus() {
+        System.out.println("args = " + args.length + " " + args[1]);
+        String pipelineId = args[1];
+        if(pipelineId == null) {
+            System.out.println("Please enter pipeline_id");
+        }
+        else {
+            MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", "getgpipelinestatus");
+            me.setParam("pipeline_id", args[1]);
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                System.out.println(me.getParams().toString());
+            }
+        }
+
+    }
+
+    public void gPipelineSubmit3() {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("tenant_id","0");
+
+        Gson gson = new GsonBuilder().create();
+
+        //public gNode(String type, String node_name, String node_id,Map<String, String> params)
+        Map<String,String> n0Params = new HashMap<>();
+        n0Params.put("pluginname","p0");
+        n0Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
+        n0Params.put("location","0");
+
+        Map<String,String> n1Params = new HashMap<>();
+        n1Params.put("pluginname","p1");
+        n1Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
+
+        Map<String,String> n2Params = new HashMap<>();
+        n2Params.put("pluginname","p2");
+        n2Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
+
+        Map<String,String> n3Params = new HashMap<>();
+        n3Params.put("pluginname","p3");
+        n3Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
+
+
+        gNode n0 = new gNode("dummy", "node0", "0", n0Params);
+        gNode n1 = new gNode("dummy", "node1", "1", n1Params);
+        gNode n2 = new gNode("dummy", "node2", "2", n2Params);
+        gNode n3 = new gNode("dummy", "node3", "3", n3Params);
+
+        List<gNode> gNodes = new ArrayList<>();
+        gNodes.add(n0);
+        gNodes.add(n1);
+        gNodes.add(n2);
+
+
+        gEdge e0 = new gEdge("0","0","1");
+
+        List<gEdge> gEdges = new ArrayList<>();
+        gEdges.add(e0);
+
+        gPayload gpay = new gPayload(gNodes,gEdges);
+        gpay.pipeline_id = "0";
+        gpay.pipeline_name = "demo_pipeline";
+
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+        System.out.println("SUBMITTED");
+    }
+
+    public void gPipelineSubmit2() {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("tenant_id","0");
+
+        Gson gson = new GsonBuilder().create();
+
+        //public gNode(String type, String node_name, String node_id,Map<String, String> params)
+        Map<String,String> n0Params = new HashMap<>();
+        n0Params.put("pluginname","cresco-sysinfo-plugin");
+        n0Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
+
+        Map<String,String> n1Params = new HashMap<>();
+        n1Params.put("pluginname","cresco-sysinfo-plugin");
+        n1Params.put("jarfile","cresco-sysinfo-plugin-0.5.0.jar");
+
+        gNode n0 = new gNode("dummy", "node0", "0", n0Params);
+        gNode n1 = new gNode("dummy", "node0", "1", n1Params);
+
+        List<gNode> gNodes = new ArrayList<>();
+        gNodes.add(n0);
+        gNodes.add(n1);
+
+        gEdge e0 = new gEdge("0","0","1");
+
+        List<gEdge> gEdges = new ArrayList<>();
+        gEdges.add(e0);
+
+        gPayload gpay = new gPayload(gNodes,gEdges);
+        gpay.pipeline_id = "0";
+        gpay.pipeline_name = "demo_pipeline";
+        me.setParam("gpipeline",gson.toJson(gpay));
+        //gPayload me = gson.fromJson(json, gPayload.class);
+        //System.out.println(p);
+        //return gson.toJson(gpay);
+
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+        System.out.println("SUBMITTED");
+    }
 
     public void gPipelineSubmit() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
