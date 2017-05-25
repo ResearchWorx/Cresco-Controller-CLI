@@ -6,6 +6,7 @@ import app.gNode;
 import app.gPayload;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import shared.MsgEvent;
@@ -45,35 +46,50 @@ public class GlobalTools {
                     pControllerPluginInventory();
                     break;
                 case 1:
-                    pControllerResourceInventory();
+                    getListRegions();
                     break;
                 case 2:
-                    gPipelineSubmit();
+                    getListAgents();
                     break;
                 case 3:
-                    getGpipeline();
+                    getListPlugins();
                     break;
                 case 4:
-                    getGpipelineStatus();
+                    getGlobalResourceInfo();
                     break;
                 case 5:
-                    printGpipelineList();
+                    pControllerResourceInventory();
                     break;
+
                 case 6:
-                    removeGpipeline();
+                    gPipelineSubmit();
                     break;
                 case 7:
-                    removeAllPipelines();
+                    getGpipeline();
                     break;
                 case 8:
-                    addQueues();
+                    getGpipelineStatus();
                     break;
                 case 9:
-                    addCOP();
+                    printGpipelineList();
                     break;
                 case 10:
+                    removeGpipeline();
+                    break;
+                case 11:
+                    removeAllPipelines();
+                    break;
+                case 12:
+                    addQueues();
+                    break;
+                case 13:
+                    addCOP();
+                    break;
+                case 14:
                     addPP();
                     break;
+
+
                 default:
                     printCmd();
             }
@@ -87,7 +103,8 @@ public class GlobalTools {
 
     public void addQueues() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-        me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "gpipelinesubmit");
         me.setParam("tenant_id","0");
 
         Gson gson = new GsonBuilder().create();
@@ -187,7 +204,8 @@ public class GlobalTools {
 
     public void addCOP() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-        me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "gpipelinesubmit");
         me.setParam("tenant_id","0");
 
         Gson gson = new GsonBuilder().create();
@@ -301,7 +319,8 @@ public class GlobalTools {
 
     public void addPP() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-        me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "gpipelinesubmit");
         me.setParam("tenant_id","0");
 
         Gson gson = new GsonBuilder().create();
@@ -436,7 +455,8 @@ public class GlobalTools {
 
     public String getEnvStatus(String environment_id, String environment_value) {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "getenvstatus");
-        me.setParam("globalcmd", "getenvstatus");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "getenvstatus");
         me.setParam("environment_id", environment_id);
         me.setParam("environment_value", environment_value);
         me = CLI.cc.sendMsgEventReturn(me);
@@ -454,7 +474,8 @@ public class GlobalTools {
         //me.setParam("src_agent", "external");
         //me.setParam("dst_region", "external");
         //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "addplugin");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "addplugin");
         me.setParam("inode_id", inode_id);
         me.setParam("resource_id", resource_id);
         me.setParam("configparams", configParams);
@@ -475,7 +496,8 @@ public class GlobalTools {
         //me.setParam("src_agent", "external");
         //me.setParam("dst_region", "external");
         //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "removeplugin");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "removeplugin");
         me.setParam("inode_id", inode_id);
         me.setParam("resource_id", resource_id);
 
@@ -497,7 +519,8 @@ public class GlobalTools {
         //me.setParam("src_agent", "external");
         //me.setParam("dst_region", "external");
         //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "getpluginstatus");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "getpluginstatus");
         me.setParam("inode_id", inode_id);
         me.setParam("resource_id", resource_id);
 
@@ -539,7 +562,9 @@ public class GlobalTools {
         //me.setParam("src_agent", "external");
         //me.setParam("dst_region", "external");
         //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "plugindownload");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+
+        me.setParam("action", "plugindownload");
         me.setParam("plugin", plugin);
         me.setParam("pluginurl", pluginurl);
         if (forceDownload) {
@@ -570,7 +595,9 @@ public class GlobalTools {
         //me.setParam("src_agent", "external");
         //me.setParam("dst_region", "external");
         //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "plugininventory");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+
+        me.setParam("action", "plugininventory");
         //return CLI.cc.sendMsgEvent(me);
         me = CLI.cc.sendMsgEventReturn(me);
         System.out.println(me.getParams().toString());
@@ -606,7 +633,8 @@ public class GlobalTools {
         try {
             pipelineList = new ArrayList<>();
             MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "getgpipelinelist");
+            me.setParam("globalcmd", Boolean.TRUE.toString());
+            me.setParam("action", "getgpipelinelist");
             me = CLI.cc.sendMsgEventReturn(me);
 
             if (me == null) {
@@ -637,7 +665,8 @@ public class GlobalTools {
     public void printGpipelineList() {
 
             MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "getgpipelinelist");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "getgpipelinelist");
             me = CLI.cc.sendMsgEventReturn(me);
 
             if(me == null) {
@@ -656,7 +685,8 @@ public class GlobalTools {
         //String pipelineId = args[1];
 
             MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "gpipelineremove");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "gpipelineremove");
             me.setParam("pipeline_id", pipelineId);
             me = CLI.cc.sendMsgEventReturn(me);
 
@@ -677,7 +707,8 @@ public class GlobalTools {
         }
         else {
             MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "gpipelineremove");
+            me.setParam("globalcmd", Boolean.TRUE.toString());
+            me.setParam("action", "gpipelineremove");
             me.setParam("pipeline_id", args[1]);
             me = CLI.cc.sendMsgEventReturn(me);
 
@@ -699,7 +730,8 @@ public class GlobalTools {
         }
         else {
             MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "getgpipeline");
+            me.setParam("globalcmd", Boolean.TRUE.toString());
+            me.setParam("action", "getgpipeline");
             me.setParam("pipeline_id", args[1]);
             me = CLI.cc.sendMsgEventReturn(me);
 
@@ -720,7 +752,8 @@ public class GlobalTools {
         }
         else {
             MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "getgpipelinestatus");
+            me.setParam("globalcmd", Boolean.TRUE.toString());
+            me.setParam("action", "getgpipelinestatus");
             me.setParam("pipeline_id", pipelineStatus);
             me = CLI.cc.sendMsgEventReturn(me);
 
@@ -746,7 +779,8 @@ public class GlobalTools {
         }
         else {
             MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-            me.setParam("globalcmd", "getgpipelinestatus");
+            me.setParam("globalcmd", Boolean.TRUE.toString());
+            me.setParam("action", "getgpipelinestatus");
             me.setParam("pipeline_id", args[1]);
             me = CLI.cc.sendMsgEventReturn(me);
 
@@ -762,7 +796,8 @@ public class GlobalTools {
 
     public void gPipelineSubmit3() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-        me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "gpipelinesubmit");
         me.setParam("tenant_id","0");
 
         Gson gson = new GsonBuilder().create();
@@ -814,7 +849,8 @@ public class GlobalTools {
 
     public void gPipelineSubmit2() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-        me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "gpipelinesubmit");
         me.setParam("tenant_id","0");
 
         Gson gson = new GsonBuilder().create();
@@ -856,7 +892,8 @@ public class GlobalTools {
 
     public void gPipelineSubmit() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
-        me.setParam("globalcmd", "gpipelinesubmit");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "gpipelinesubmit");
         me.setParam("tenant_id","0");
 
         Gson gson = new GsonBuilder().create();
@@ -984,11 +1021,14 @@ public class GlobalTools {
         //me.setParam("src_agent", "external");
         //me.setParam("dst_region", "external");
         //me.setParam("dst_agent", "external");
-        me.setParam("globalcmd", "resourceinventory");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+
+        me.setParam("action", "resourceinventory");
         //return CLI.cc.sendMsgEvent(me);
 
+        System.out.println("SENDING..");
         me = CLI.cc.sendMsgEventReturn(me);
-
+        System.out.println("REC...");
         System.out.println(me.getParams().toString());
 
         /*
@@ -1002,6 +1042,47 @@ public class GlobalTools {
 		}
 		*/
         return inventory;
+    }
+
+    public void getListRegions() {
+        MsgEvent me = new MsgEvent(MsgEventType.EXEC, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "listregions");
+
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+
+    }
+
+    public void getListAgents() {
+        MsgEvent me = new MsgEvent(MsgEventType.EXEC, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "listagents");
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+
+    }
+
+    public void getListPlugins() {
+        MsgEvent me = new MsgEvent(MsgEventType.EXEC, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "listplugins");
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+
+    }
+
+    public void getGlobalResourceInfo() {
+        MsgEvent me = new MsgEvent(MsgEventType.EXEC, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "resourceinfo");
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+
     }
 
     public void getPluginInfo(String plugin_id) {

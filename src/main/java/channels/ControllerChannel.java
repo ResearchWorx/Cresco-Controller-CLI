@@ -86,12 +86,12 @@ public class ControllerChannel {
 						response.append(inputLine);
 				}
 				in.close();
-			
+
+
 				
 				try
 				{
-					//System.out.println(response);
-					me = meFromJson(response.toString());
+				    me = meFromJson(response.toString());
 				}
 				catch(Exception ex)
 				{
@@ -149,6 +149,7 @@ public class ControllerChannel {
 					response.append(inputLine);
 				}
 				in.close();
+				System.out.println(response.toString());
                 me = meFromJson(response.toString());
 				//returnString = response.toString();
 			}
