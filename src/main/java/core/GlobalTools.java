@@ -60,7 +60,6 @@ public class GlobalTools {
                 case 5:
                     pControllerResourceInventory();
                     break;
-
                 case 6:
                     gPipelineSubmit();
                     break;
