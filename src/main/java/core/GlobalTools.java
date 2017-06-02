@@ -13,10 +13,13 @@ import shared.MsgEvent;
 import shared.MsgEventType;
 
 import javax.xml.bind.DatatypeConverter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class GlobalTools {
@@ -322,7 +325,7 @@ public class GlobalTools {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
         me.setParam("globalcmd", Boolean.TRUE.toString());
         me.setParam("action", "gpipelinesubmit");
-        me.setParam("tenant_id","0");
+        me.setParam("action_tenantid","0");
 
         Gson gson = new GsonBuilder().create();
 
@@ -424,11 +427,13 @@ public class GlobalTools {
         gpay.pipeline_id = "0";
         gpay.pipeline_name = "demo_pipeline";
 
+        System.out.println(gson.toJson(gpay));
+
         String compressedGpay = DatatypeConverter.printBase64Binary(stringCompress(gson.toJson(gpay)));
 
         me.setParam("gpipeline_compressed",String.valueOf(Boolean.TRUE));
 
-        me.setParam("gpipeline",compressedGpay);
+        me.setParam("action_gpipeline",compressedGpay);
         //gPayload me = gson.fromJson(json, gPayload.class);
         //System.out.println(p);
         //return gson.toJson(gpay);
@@ -790,6 +795,22 @@ public class GlobalTools {
         return pipelineList;
     }
 
+    public String stringUncompress(String str) {
+        String uncompressedString = null;
+        try {
+
+            byte[] exportDataRawCompressed = DatatypeConverter.parseBase64Binary(str);
+            InputStream iss = new ByteArrayInputStream(exportDataRawCompressed);
+            //uncompress
+            InputStream is = new GZIPInputStream(iss);
+            uncompressedString = new Scanner(is,"UTF-8").useDelimiter("\\A").next();
+        }
+        catch(Exception ex) {
+            logger.error("uncompressParam " + ex.getMessage());
+        }
+        return uncompressedString;
+    }
+
     public void printGPipelineStatus() {
 
             MsgEvent me = new MsgEvent(MsgEventType.EXEC, null, null, null, "get resourceinventory inventory");
@@ -807,7 +828,11 @@ public class GlobalTools {
                     System.out.println(pipelineIdString);
                 }
                 */
-                System.out.println(me.getParams().toString());
+                //System.out.println(me.getParams().toString());
+                String compressed = me.getParam("pipelineinfo");
+                String uncompressed = stringUncompress(compressed);
+                System.out.println(uncompressed);
+
             }
     }
 
@@ -839,7 +864,7 @@ public class GlobalTools {
             MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
             me.setParam("globalcmd", Boolean.TRUE.toString());
             me.setParam("action", "gpipelineremove");
-            me.setParam("pipeline_id", args[1]);
+            me.setParam("action_pipelineid", args[1]);
             me = CLI.cc.sendMsgEventReturn(me);
 
             if(me == null) {
@@ -862,14 +887,19 @@ public class GlobalTools {
             MsgEvent me = new MsgEvent(MsgEventType.EXEC, null, null, null, "get resourceinventory inventory");
             me.setParam("globalcmd", Boolean.TRUE.toString());
             me.setParam("action", "getgpipeline");
-            me.setParam("pipeline_id", args[1]);
+            me.setParam("action_pipelineid", args[1]);
             me = CLI.cc.sendMsgEventReturn(me);
 
             if(me == null) {
                 System.out.println("Can't get gpipeline");
             }
             else {
-                System.out.println(me.getParams().toString());
+                //System.out.println(me.getParams().toString());
+                //gpipeline
+                String compressed = me.getParam("gpipeline");
+                String uncompressed = stringUncompress(compressed);
+                System.out.println(uncompressed);
+                //System.out.println(me.getParam("gpipeline"));
             }
         }
 
