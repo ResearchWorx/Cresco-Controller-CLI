@@ -70,7 +70,7 @@ public class GlobalTools {
                     getGpipeline();
                     break;
                 case 8:
-                    //getGpipelineStatus();
+                    getGpipelineExport();
                     break;
                 case 9:
                     printGPipelineStatus();
@@ -93,7 +93,10 @@ public class GlobalTools {
                 case 15:
                     addContainer();
                     break;
-
+                case 16:
+                    gPipelineSubmitIRNC();
+                case 17:
+                    getGlobalNetResourceInfo();
                 default:
                     printCmd();
             }
@@ -118,7 +121,8 @@ public class GlobalTools {
         List<gNode> gNodes = new ArrayList<>();
 
 
-        String[] locationIds = {"14", "15", "17", "18", "20", "21", "22", "23", "25", "26", "27", "28", "30", "31", "32", "33", "34", "36", "38"};
+        //String[] locationIds = {"14", "15", "17", "18", "20", "21", "22", "23", "25", "26", "27", "28", "30", "31", "32", "33", "34", "36", "38"};
+        String[] locationIds = {"queue"};
 
         int count = 0;
 
@@ -205,6 +209,8 @@ public class GlobalTools {
         //System.out.println("SUBMITTED");
         System.out.println("PipelineId =" +  me.getParam("gpipeline_id"));
     }
+
+
 
     public void addCOP() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
@@ -333,7 +339,7 @@ public class GlobalTools {
 
         List<gNode> gNodes = new ArrayList<>();
 
-        String[] locationIds = {"007"};
+        String[] locationIds = {"14", "15", "16"};
         //String[] locationIds = {"14", "15", "17", "18", "20", "21", "22", "23", "25", "26", "27", "28", "30", "31", "32", "33", "34", "36", "38"};
         //String[] locationIds = {"14", "15", "17", "18", "20", "21", "22", "23", "25", "26", "27", "28", "30", "31", "32", "33", "34", "36", "38"};
 
@@ -368,7 +374,8 @@ public class GlobalTools {
             n0Params.put("e_params", "CRESCO_path_stage:CRESCO_cop_id:CRESCO_pp_amqp_host:CRESCO_pp_amqp_username:CRESCO_pp_amqp_password:CRESCO_discovery_secret_agent:CRESCO_discovery_ipv4_agent_timeout");
             n0Params.put("CRESCO_path_stage","1");
             n0Params.put("CRESCO_cop_id","cop-"+location);
-            n0Params.put("CRESCO_pp_amqp_host","128.163.202." + location);
+            //n0Params.put("CRESCO_pp_amqp_host","128.163.202." + location);
+            n0Params.put("CRESCO_pp_amqp_host","10.33.70.18");
             n0Params.put("CRESCO_pp_amqp_username","admin");
             n0Params.put("CRESCO_pp_amqp_password","cody01");
             n0Params.put("location", location);
@@ -877,6 +884,34 @@ public class GlobalTools {
 
     }
 
+    public void getGpipelineExport() {
+        System.out.println("args = " + args.length + " " + args[1]);
+        String pipelineId = args[1];
+        if(pipelineId == null) {
+            System.out.println("Please enter pipeline_id");
+        }
+        else {
+            MsgEvent me = new MsgEvent(MsgEventType.EXEC, null, null, null, "get resourceinventory inventory");
+            me.setParam("globalcmd", Boolean.TRUE.toString());
+            me.setParam("action", "getgpipelineexport");
+            me.setParam("action_pipelineid", args[1]);
+            me = CLI.cc.sendMsgEventReturn(me);
+
+            if(me == null) {
+                System.out.println("Can't get gpipeline");
+            }
+            else {
+                //System.out.println(me.getParams().toString());
+                //gpipeline
+                String compressed = me.getParam("gpipeline");
+                String uncompressed = stringUncompress(compressed);
+                System.out.println(uncompressed);
+                //System.out.println(me.getParam("gpipeline"));
+            }
+        }
+
+    }
+
     public void getGpipeline() {
         System.out.println("args = " + args.length + " " + args[1]);
         String pipelineId = args[1];
@@ -1052,11 +1087,98 @@ public class GlobalTools {
         System.out.println("SUBMITTED");
     }
 
+    public void gPipelineSubmitIRNC() {
+        MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "gpipelinesubmit");
+        me.setParam("action_tenantid","0");
+
+
+        Gson gson = new GsonBuilder().create();
+
+/*
+        Map<String,String> n0Params = new HashMap<>();
+        n0Params.put("pluginname","cresco-container-plugin");
+        n0Params.put("jarfile","cresco-container-plugin-0.1.0.jar");
+        n0Params.put("container_image","docker.elastic.co/elasticsearch/elasticsearch:5.2.2");
+        n0Params.put("e_parms","http.host:transport.host");
+        n0Params.put("http.host","0.0.0.0");
+        n0Params.put("transport.host","127.0.0.1");
+        n0Params.put("p_parms","9200:9200");
+        n0Params.put("location","demo-global-controller");
+*/
+        //docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+
+
+        Map<String,String> n0Params = new HashMap<>();
+        n0Params.put("pluginname","cresco-container-plugin");
+        n0Params.put("jarfile","cresco-container-plugin-0.1.0.jar");
+        n0Params.put("container_image","rabbitmq:3-management");
+        n0Params.put("e_parms","RABBITMQ_DEFAULT_USER:RABBITMQ_DEFAULT_PASS");
+        n0Params.put("RABBITMQ_DEFAULT_USER","user");
+        n0Params.put("RABBITMQ_DEFAULT_PASS","password");
+        n0Params.put("p_parms","5672:15672");
+        //n0Params.put("location","demo-global-controller");
+        n0Params.put("location","location0");
+
+        Map<String,String> n1Params = new HashMap<>();
+        n1Params.put("pluginname","cresco-container-plugin");
+        n1Params.put("jarfile","cresco-container-plugin-0.1.0.jar");
+        n1Params.put("container_image","rabbitmq:3-management");
+        n1Params.put("e_parms","RABBITMQ_DEFAULT_USER:RABBITMQ_DEFAULT_PASS");
+        n1Params.put("RABBITMQ_DEFAULT_USER","user");
+        n1Params.put("RABBITMQ_DEFAULT_PASS","password");
+        n1Params.put("p_parms","5672:15672");
+        n1Params.put("location","location1");
+
+        Map<String,String> n2Params = new HashMap<>();
+        n2Params.put("pluginname","cresco-container-plugin");
+        n2Params.put("jarfile","cresco-container-plugin-0.1.0.jar");
+        n2Params.put("container_image","rabbitmq:3-management");
+        n2Params.put("e_parms","RABBITMQ_DEFAULT_USER:RABBITMQ_DEFAULT_PASS");
+        n2Params.put("RABBITMQ_DEFAULT_USER","user");
+        n2Params.put("RABBITMQ_DEFAULT_PASS","password");
+        n2Params.put("p_parms","5672:15672");
+        n2Params.put("location","location2");
+
+        List<gNode> gNodes = new ArrayList<>();
+
+        gNodes.add(new gNode("QueueProvider", "location0", "0", n0Params));
+        gNodes.add(new gNode("QueueProvider", "location1", "1", n1Params));
+        gNodes.add(new gNode("QueueProvider", "location2", "2", n2Params));
+
+
+        gEdge e0 = new gEdge("0","1000000","1000000");
+
+        List<gEdge> gEdges = new ArrayList<>();
+        gEdges.add(e0);
+
+        gPayload gpay = new gPayload(gNodes,gEdges);
+        gpay.pipeline_id = "0";
+        gpay.pipeline_name = "demo_pipeline";
+
+        String compressedGpay = DatatypeConverter.printBase64Binary(stringCompress(gson.toJson(gpay)));
+
+        me.setParam("gpipeline_compressed",String.valueOf(Boolean.TRUE));
+
+        System.out.println("\n" + gson.toJson(gpay) + "\n");
+
+        me.setParam("action_gpipeline",compressedGpay);
+
+        System.out.println(me.getParams().toString());
+
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println("PipelineId =" +  me.getParam("gpipeline_id"));
+    }
+
+
     public void gPipelineSubmit() {
         MsgEvent me = new MsgEvent(MsgEventType.CONFIG, null, null, null, "get resourceinventory inventory");
         me.setParam("globalcmd", Boolean.TRUE.toString());
         me.setParam("action", "gpipelinesubmit");
-        me.setParam("tenant_id","0");
+        me.setParam("action_tenantid","0");
+
 
         Gson gson = new GsonBuilder().create();
 
@@ -1124,16 +1246,19 @@ public class GlobalTools {
 
         me.setParam("gpipeline_compressed",String.valueOf(Boolean.TRUE));
 
-        me.setParam("gpipeline",compressedGpay);
+        System.out.println("\n" + gson.toJson(gpay) + "\n");
+
+        me.setParam("action_gpipeline",compressedGpay);
         //gPayload me = gson.fromJson(json, gPayload.class);
         //System.out.println(p);
         //return gson.toJson(gpay);
 
         System.out.println(me.getParams().toString());
 
-        //me = CLI.cc.sendMsgEventReturn(me);
+        me = CLI.cc.sendMsgEventReturn(me);
 
-        me = CLI.cc.sendJSONReturn("/addgpipeline",gson.toJson(me));
+        //me = CLI.cc.sendJSONReturn("/addgpipeline",gson.toJson(me));
+
 
         //ce.setParam("gpipeline_id",gpay.pipeline_id);
         //System.out.println(returnString);
@@ -1241,6 +1366,16 @@ public class GlobalTools {
         MsgEvent me = new MsgEvent(MsgEventType.EXEC, null, null, null, "get resourceinventory inventory");
         me.setParam("globalcmd", Boolean.TRUE.toString());
         me.setParam("action", "resourceinfo");
+        me = CLI.cc.sendMsgEventReturn(me);
+
+        System.out.println(me.getParams().toString());
+
+    }
+
+    public void getGlobalNetResourceInfo() {
+        MsgEvent me = new MsgEvent(MsgEventType.EXEC, null, null, null, "get resourceinventory inventory");
+        me.setParam("globalcmd", Boolean.TRUE.toString());
+        me.setParam("action", "netresourceinfo");
         me = CLI.cc.sendMsgEventReturn(me);
 
         System.out.println(me.getParams().toString());
